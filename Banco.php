@@ -721,7 +721,7 @@
 							INNER JOIN forma_pagamento ON forma_pagamento_operadora_empresa.fk_forma_pagamento = forma_pagamento.id_forma_pagamento
 							INNER JOIN operadora_empresa ON forma_pagamento_operadora_empresa.fk_operadora_empresa = operadora_empresa.id_operadora_empresa
 							INNER JOIN operadoras ON operadora_empresa.fk_operadora = operadoras.id_operadora 
-						WHERE transacao.status_geral = 0";
+						WHERE transacao.status_geral = 0 LIMIT 10";
 				
 				$result = $this->conexao_banco->query($sql);
 				$_SESSION["listaPedidos"] = array();  

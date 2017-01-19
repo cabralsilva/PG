@@ -87,7 +87,7 @@ function processarBoleto($retorno){
 		$dadosboleto ["endereco"] = $endereco;
 		$dadosboleto ["cidade_uf"] = $retorno ["Model"] ["Empresa"] ["MUNICIPIO"];
 		$dadosboleto ["cedente"] = $retorno ["Model"] ["Empresa"] ["RAZAO_SOCIAL"];
-	
+	    $dadosboleto ["id_empresa"] = $retorno ["Model"] ["fk_empresa"];
 	
 	
 		include("../util/boletos/include/funcoes_bb.php");

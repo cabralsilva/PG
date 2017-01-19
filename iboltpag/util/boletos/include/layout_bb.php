@@ -82,9 +82,16 @@
 /* *** CABECALHO *** */
 
 #instr_header {
-	background: url('imagens/logo_empresa.png') no-repeat top left;
-	padding-left: 160px;
+	/*background: url('imagens/logo_empresa.png') no-repeat top left;
+	background-repeat: no-repeat;
+    background-size: 160px 65px !important;
+	padding-left: 160px;*/
 	height: 65px;
+}
+
+#instr_header img{
+	float: left;
+    margin-right: 10px;
 }
 
 #instr_header h1 {
@@ -494,43 +501,47 @@ div.barcode {
 <div id="container">
 
 	<div id="instr_header">
+		<img height="65" width="160" src="http://<?= $_SERVER['HTTP_HOST'] ?>/sii/iboltpag/resources/logos/<?= $dadosboleto ["id_empresa"] ?>.png"/>
 		<h1><?php echo $dadosboleto["identificacao"]; ?> <?php echo isset($dadosboleto["cpf_cnpj"]) ? $dadosboleto["cpf_cnpj"] : '' ?></h1>
-		<address><?php echo $dadosboleto["endereco"]; ?><br></address>
-		<address><?php echo $dadosboleto["cidade_uf"]; ?></address>
+		<address><?php //echo $dadosboleto["endereco"]; ?><br></address>
+		<address><?php //echo $dadosboleto["cidade_uf"]; ?></address>
 	</div>	<!-- id="instr_header" -->
 
-	<div id="">
+<!-- 	<div id=""> -->
 <!--
   Use no lugar do <div id=""> caso queira imprimir sem o logotipo e instru��es
   <div id="instructions">
  -->
 		
-		<div id="instr_content">
-			<p>
-				O pagamento deste boleto tamb&eacute;m poder&aacute; ser efetuado 
-				nos terminais de Auto-Atendimento BB.
-			</p>
+<!-- 		<div id="instr_content"> -->
+<!-- 			<p> -->
+<!-- 				O pagamento deste boleto tamb&eacute;m poder&aacute; ser efetuado  -->
+<!-- 				nos terminais de Auto-Atendimento BB. -->
+<!-- 			</p> -->
 			
-			<h2>Instru&ccedil;&otilde;es</h2>
-			<ol>
-			<li>
-				Imprima em impressora jato de tinta (ink jet) ou laser, em 
-				qualidade normal ou alta. N&atilde;o use modo econ&ocirc;mico. 
-				<p class="notice">Por favor, configure margens esquerda e direita
-				para 17mm.</p>
-			</li>
-			<li>
-				Utilize folha A4 (210 x 297 mm) ou Carta (216 x 279 mm) e margens
-				m&iacute;nimas &agrave; esquerda e &agrave; direita do 
-				formul&aacute;rio.
-			</li>
-			<li>
-				Corte na linha indicada. N&atilde;o rasure, risque, fure ou dobre 
-				a regi&atilde;o onde se encontra o c&oacute;digo de barras
-			</li>
-			</ol>
-		</div>	<!-- id="instr_content" -->
-	</div>	<!-- id="instructions" -->
+<!-- 			<h2>Instru&ccedil;&otilde;es</h2> -->
+<!-- 			<ol> -->
+<!-- 			<li> -->
+<!-- 				Imprima em impressora jato de tinta (ink jet) ou laser, em  -->
+<!-- 				qualidade normal ou alta. N&atilde;o use modo econ&ocirc;mico.  -->
+<!-- 				<p class="notice">Por favor, configure margens esquerda e direita -->
+<!-- 				para 17mm.</p> -->
+<!-- 			</li> -->
+<!-- 			<li> -->
+<!-- 				Utilize folha A4 (210 x 297 mm) ou Carta (216 x 279 mm) e margens -->
+<!-- 				m&iacute;nimas &agrave; esquerda e &agrave; direita do  -->
+<!-- 				formul&aacute;rio. -->
+<!-- 			</li> -->
+<!-- 			<li> -->
+<!-- 				Corte na linha indicada. N&atilde;o rasure, risque, fure ou dobre  -->
+<!-- 				a regi&atilde;o onde se encontra o c&oacute;digo de barras -->
+<!-- 			</li> -->
+<!-- 			</ol> -->
+<!--		</div>	<!-- id="instr_content" -->
+<!--	</div>	<!-- id="instructions" -->
+	
+	<div id="instructions">
+	</div>
 	
 	<div id="boleto">
 		<div class="cut">
@@ -541,7 +552,7 @@ do Pagador</b></div></TD></tr></tbody></table>
 		<table class="header" border=0 cellspacing="0" cellpadding="0">
 		<tbody>
 		<tr>
-			<td width=150><IMG SRC="../util/boletos/imagens/logobb.jpg"></td>
+			<td width=150><IMG SRC="http://<?= $_SERVER['HTTP_HOST'] ?>/sii/iboltpag/util/boletos/imagens/logobb.jpg"></td>
 			<td width=50>
         <div class="field_cod_banco"><?php echo $dadosboleto["codigo_banco_com_dv"]?></div>
 			</td>
@@ -634,7 +645,7 @@ do Pagador</b></div></TD></tr></tbody></table>
 		<table class="header" border=0 cellspacing="0" cellpadding="0">
 		<tbody>
 		<tr>
-			<td width=150><IMG SRC="../util/boletos/imagens/logobb.jpg"></td>
+			<td width=150><IMG SRC="http://<?= $_SERVER['HTTP_HOST'] ?>/sii/iboltpag/util/boletos/imagens/logobb.jpg"></td>
 			<td width=50>
         <div class="field_cod_banco"><?php echo $dadosboleto["codigo_banco_com_dv"]?></div>
 			</td>

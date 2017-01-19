@@ -160,10 +160,10 @@ $altura = 50 ;
 
 //   print_r( $_SERVER);
 //Guarda inicial
-?><img src=../util/boletos/imagens/p.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
-src=../util/boletos/imagens/b.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
-src=../util/boletos/imagens/p.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
-src=../util/boletos/imagens/b.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
+?><img src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/p.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
+src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/b.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
+src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/p.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
+src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/b.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
 <?php
 $texto = $valor ;
 if((strlen($texto) % 2) <> 0){
@@ -182,7 +182,7 @@ while (strlen($texto) > 0) {
       $f1 = $largo ;
     }
 ?>
-    src=../util/boletos/imagens/p.png width=<?php echo $f1?> height=<?php echo $altura?> border=0><img 
+    src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/p.png width=<?php echo $f1?> height=<?php echo $altura?> border=0><img 
 <?php
     if (substr($f,$i,1) == "0") {
       $f2 = $fino ;
@@ -190,16 +190,16 @@ while (strlen($texto) > 0) {
       $f2 = $largo ;
     }
 ?>
-    src=../util/boletos/imagens/b.png width=<?php echo $f2?> height=<?php echo $altura?> border=0><img 
+    src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/b.png width=<?php echo $f2?> height=<?php echo $altura?> border=0><img 
 <?php
   }
 }
-echo dirname(".");
+//echo dirname(".");
 // Draw guarda final
 ?>
-src=../util/boletos/imagens/p.png width=<?php echo $largo?> height=<?php echo $altura?> border=0><img 
-src=../util/boletos/imagens/b.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
-src=../util/boletos/imagens/p.png width=<?php echo 1?> height=<?php echo $altura?> border=0> 
+src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/p.png width=<?php echo $largo?> height=<?php echo $altura?> border=0><img 
+src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/b.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
+src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/p.png width=<?php echo 1?> height=<?php echo $altura?> border=0> 
   <?php
 } //Fim da fun��o
 

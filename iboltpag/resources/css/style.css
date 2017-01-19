@@ -203,3 +203,19 @@ form{
 .ceppagador{
 	width: 115%
 }
+
+.alignright{
+    text-align: right;
+}
+
+.moredetailpayment{
+	padding: 0px !important;	
+}
+
+.valign{
+	vertical-align: middle !important;
+}
+
+.tab-principal{
+	font-size: 18px !important;
+}

@@ -16,7 +16,7 @@
 		if ($banco->getStatusLogin()) {
 			$banco->verificarSistemasHabilitados();
 			//die();
-			header("location:iboltpag/buscardados_transacao.php");
+			header("location:iboltpag/views/home.php");
 		}
 	}
 ?>

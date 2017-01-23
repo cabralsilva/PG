@@ -49,7 +49,7 @@
           
                 <div class="col-md-5">
                     <div class="box-<?php echo $modulo['cor_sistema']; ?>">
-                        <div class="texto" style="top: 45%; position:relative; text-align:center;"><a href="<?php echo $modulo['diretorio_sistema']; ?>/buscardados_transacao.php"><?php echo $modulo['descricao_sistema']; ?></a></div>
+                        <div class="texto" style="top: 45%; position:relative; text-align:center;"><a href="<?php echo $modulo['diretorio_sistema']; ?>/views/home.php"><?php echo $modulo['descricao_sistema']; ?></a></div>
                                     
                     </div>
                 </div>

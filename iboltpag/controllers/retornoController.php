@@ -41,7 +41,34 @@ if (! validarSintaxeArquivo ( $arquivoRetorno )) {
 				break;
 			}
 		} elseif ($tipoRegistro == "7") {
-			$nosso_numero = substr($linha, 63, 17);
+			$nosso_numero = substr($linha, 70, 10);
+			$origem = substr($nosso_numero, 0, 1);
+			$fk_pagamento = ltrim(substr($nosso_numero, 1), '0');
+			
+			$comando = substr($linha, 108, 2);
+			$nat_recebimento = substr($linha, 86, 2);
+			$nosso_numero = $num_convenio.$nosso_numero;
+			if ($comando == "03"){
+				//O REGISTRO FOI RECUSADO
+				print_r(array("CodStatus" => 2, "Msg" => "Registro $nosso_numero foi recusado. Motivo: $nat_recebimento", "Model" => $linha));
+			}else{
+				switch ($comando){
+					case "06":
+// 						$data_pagamento = substr($linha, 110, 6);
+// 						$valor_pagamento = substr($linha, 253, 13);
+// 						echo "DT: $data_pagamento\n\n";
+			
+// 						$ts = new TransacaoService();
+// 						$ts->liquidarPagamento($_SESSION["dados_acesso"][0]["CODIGO"], $origem, $fk_pagamento, $data_pagamento, $valor_pagamento);
+						break;
+				}
+			}
+// 			echo "\nNN: $nosso_numero";
+// 			echo "\nOR: $origem";
+// 			echo "\nPG: $fk_pagamento";
+// 			echo "\nCM: $comando";
+// 			echo "\nNR: $nat_recebimento\n";
+			
 // 			echo "\npercorrendo detalhe registro...\n";
 		} elseif ($tipoRegistro == "9") {
 // 			echo "\npercorrendo trailler...\n";
@@ -73,6 +100,8 @@ function validarSintaxeArquivo($arquivoRetorno) {
 			$bancoIde = substr ( $linha, 76, 18 );
 			$seqRegis = substr ( $linha, 394, 6 );
 			
+			
+			
 			if ($tipoOper != "2")
 				return false;
 			if ($literaOp != "RETORNO")
@@ -81,13 +110,21 @@ function validarSintaxeArquivo($arquivoRetorno) {
 				return false;
 			if ($literaSe != "COBRANCA")
 				return false;
-			if ($bancoIde != "001BANCODOBRASIL  ")
+			if ($bancoIde != "001BANCO DO BRASIL")
 				return false;
 			if ($seqRegis != "000001")
 				return false;
+// 			echo "\nTipo Op: $tipoOper";
+// 			echo "\nLite Op: $literaOp";
+// 			echo "\nTipo Se: $tipoServ";
+// 			echo "\nLite Se: $literaSe";
+// 			echo "\nBanc Id: $bancoIde";
+// 			echo "\nSeq Reg: $seqRegis\n";
 		} elseif ($tipoRegistro == "7") {
-			
+// 			echo "Novo: $tipoRegistro\n";
 		} elseif ($tipoRegistro == "9") {
+// 			echo "Novo: $tipoRegistro\n";
+			return true;
 		} else {
 			return false;
 		}

@@ -557,7 +557,6 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 	
 	public function montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual ){
 		//ELIMINA OS ARQUIVO SALVOS NA APLICAÇÃO QUE FORAM CRIADOS A MAIS DE UM MINUTO		
-		$files = array();
 		foreach (glob("*.REM") as $file) {
 			$modificado = new DateTime(date("Y-m-d\TH:i:s", filemtime($file)));
 			$atual = new DateTime();
@@ -670,7 +669,7 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 				$this->gerarEspacosZeros ( 6 ) . // número borderô - tamanho 6 / 096-101
 				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["tipo_cobranca_banco_brasil"], 5 ) . // Tipo de Cobrança - tamanho 5 / 102-106
 				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["codigo_carteira"], 2 ) . // Carteira - tamanho 2 / 107-108
-				"01" . // COMANDO VIDE MANUAL - tamanho 2 / 109-110
+				"32" . // COMANDO VIDE MANUAL - tamanho 2 / 109-110
 				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["fk_pedido"], 10 ) . // Seu Número/Número do Título Atribuído pelo Cedente - TAMANHO 10 / 111-120 NUM
 				$data_vencimento->format ( 'dmy' ) . // DATA VENCIMENTO TITULO - TAMANHO 6 / 121-126 NUM
 	
@@ -959,6 +958,7 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		$consulta->close ();
 		return $lstPgto;
 	}
+	
 	public function buscarPersonalizadaPagamentos($identificador, $listOrigem, $codOrigem, $listaOperadoras, $dataI, $dataF, $listaStatus, $listaFormaPgto, $valorTransacao) {
 		$previous = false;
 		
@@ -1071,6 +1071,26 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		
 		//echo $sql;
 		return $this->buscaTransacoesPersonalizada ( $sql, $_SESSION ["dados_acesso"] [0] ["CODIGO"] );
+	}
+	
+	public function liquidarPagamento($cod_empresa, $origem, $fk_pagamento, $data_pagamento, $valor_pagamento){
+		$data_pag = new DateTime( date("dmy", strtotime($data_pagamento)) );
+		$valor = ltrim($valor_pagamento, '0');
+		$valor = ($valor/100);
+
+		$sql = "UPDATE transacao 
+				LEFT OUTER JOIN forma_pagamento_operadora_empresa ON transacao.fk_forma_pagamento_operadora_empresa = forma_pagamento_operadora_empresa.id_forma_pagamento_operadora_empresa
+				LEFT OUTER JOIN operadora_empresa ON forma_pagamento_operadora_empresa.fk_operadora_empresa = operadora_empresa.id_operadora_empresa
+				INNER JOIN empresa ON operadora_empresa.fk_empresa = empresa.CODIGO
+				SET 
+					transacao.status_geral = 9,
+					transacao.data_pagamento = '".$data_pag->format('Y-m-d')."',
+					transacao.valor_pago = $valor
+				WHERE empresa.CODIGO = $cod_empresa AND transacao.tipo_cobranca = $origem AND transacao.fk_pedido_pagamento = $fk_pagamento";
+// 		echo "\n$sql\n";
+		$result = $this->banco->getConexaoBanco ()->query ( $sql );
+// 		$result->close ();
+// 		return $total;
 	}
 }
 	

@@ -53,25 +53,31 @@
 			</div>
 			<div class="modal-body">
 				<p>Selecione o arquivo enviado pelo banco...</p>
-				<form role="form">
+				<form id="formulario" role="form" method="post" enctype="multipart/form-data">
 					<div class="form-group">
-					    <label for="exampleInputFile">Arquivo de retorno</label>
-					    <input type="file" id="arquivoRetorno">
-						<p class="help-block">Extensão .ret</p>
+<!-- 					    <label for="exampleInputFile">Arquivo de retorno</label> -->
+<!-- 					    <input type="file" id="arquivoRetorno"> -->
+<!-- 						<p class="help-block">Extensão .ret</p> -->
+						
+						<input type="text" name="servico" value="processarRetorno" class="hidden" />
+						<label for="exampleInputFile">Arquivo de retorno</label>
+					    <input name="arquivo" type="file" accept=".RET"/>
+					    <p class="help-block">Extensão .ret</p>
+					    <button>Enviar</button>
 					</div>
 				</form>
 				
 				
-				<form id="formulario" method="post" enctype="multipart/form-data">
-				    <input type="text" name="servico" value="processarRetorno" class="hidden" />
-				    <input name="arquivo" type="file" accept=".RET"/>
-				    <button>Enviar</button>
-				</form>
+<!-- 				<form id="formulario" method="post" enctype="multipart/form-data"> -->
+<!-- 				    <input type="text" name="servico" value="processarRetorno" class="hidden" /> -->
+<!-- 				    <input name="arquivo" type="file" accept=".RET"/> -->
+<!-- 				    <button>Enviar</button> -->
+<!-- 				</form> -->
 			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
-				<button type="button" class="btn btn-primary">Processar</button>
-			</div>
+<!-- 			<div class="modal-footer"> -->
+<!-- 				<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button> -->
+<!--				<button type="button" class="btn btn-primary" onclick="processarRetorno()">Processar</button> -->
+<!-- 			</div> -->
 		</div>
 	</div>
 </div>

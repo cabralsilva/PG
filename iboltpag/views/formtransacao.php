@@ -1,6 +1,8 @@
 <?php
 	require_once '../util/constantes.php';
-	include '../controllers/formTransacaoController.php';
+// 	include '../controllers/formTransacaoController.php';
+	include '../controllers/formController.php';
+	$fc = new FormController ();
 	//session_start ();
 	date_default_timezone_set ( 'America/Sao_Paulo' );
 	getOperadorasBoleto($_SESSION["dados_acesso"][0]["CODIGO"]);
@@ -48,30 +50,9 @@
 			<div class="panel-group" id="accordion">
 				<div class="panel panel-info">
 					<div class="panel-heading">
-                    	<div class="row">
-						    <div class="col-md-5">
-						    	<span class="nome-empresa"><?php echo $_SESSION["dados_acesso"][0]["NOME"] ?></span> <span class="nome-pagina">  Emissão manual de boletos</span>
-							</div>
-						    <div class="col-md-3" align="center">
-							    
-
-							</div>
-						    <div class="col-md-4" align="right">Funcionário logado: <?php echo $_SESSION["dados_acesso"][0]["nome_usuario"] ?>
-						    	<div class="btn-group">
-						    		<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Opções <span class="caret"></span></button>
-					    			<ul class="dropdown-menu">
-<!-- 					    				<li><a href="../relatorio.php">Cartões</a></li> -->
-										<li><a href="javascript:void(0)" onclick="boletos();">Boletos</a></li>
-										<li><a href="../buscardados_transacao.php">Pagamentos agrupados</a></li>
-					    				<li role="separator" class="divider"></li>
-					    				<li><a href="../../modulos.php">Sistemas</a></li>
-					    				<li><a href="../../logout.php">Logout</a></li>
-					    			</ul>
-						    	</div>
-                            </div>
-						</div>
-						<p>
-                        <p>
+                    	<h3 class="panel-title">
+							<?php include 'layout/header.php';?>
+						</h3>
                     </div>
 					<div class="panel-body">
 						<div class="progress hidden">
@@ -211,7 +192,7 @@
 				</div>
 			</div>
 		</div>
-	
+		<?php include 'layout/modais.php';?>
 	<script type="text/javascript">
 		var isAvulso = false;
 		var valor, valorP;

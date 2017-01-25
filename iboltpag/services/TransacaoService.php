@@ -666,11 +666,16 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 				$this->gerarEspacosBrancos ( 3 ) . // Indicativo de Mensagem ou Sacador/Avalista - TAMANHO 3 / 089-091 branco
 				$this->zerosEsquerda ( $variacaoCarteira, 3 ) . // Variação da carteira - tamanho 3 / 092-094
 				$this->gerarEspacosZeros ( 1 ) . // conta caução - tamanho 1 / 095-095 "0"
-				$this->gerarEspacosZeros ( 6 ) . // número borderô - tamanho 6 / 096-101
-				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["tipo_cobranca_banco_brasil"], 5 ) . // Tipo de Cobrança - tamanho 5 / 102-106
-				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["codigo_carteira"], 2 ) . // Carteira - tamanho 2 / 107-108
-				"32" . // COMANDO VIDE MANUAL - tamanho 2 / 109-110
-				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["fk_pedido"], 10 ) . // Seu Número/Número do Título Atribuído pelo Cedente - TAMANHO 10 / 111-120 NUM
+				$this->gerarEspacosZeros ( 6 ); // número borderô - tamanho 6 / 096-101
+				if ($lstTransacoes[($_i - 1)]["tipo_cobranca_banco_brasil"] != null)
+					$regTransacao .= $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["tipo_cobranca_banco_brasil"], 5 );
+				else
+					$regTransacao .= $this->gerarEspacosBrancos(5);
+// 				($lstTransacoes[($_i - 1)]["tipo_cobranca_banco_brasil"] == null)?($this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["tipo_cobranca_banco_brasil"], 5 )):$this->gerarEspacosBrancos(5) . // Tipo de Cobrança - tamanho 5 / 102-106
+				$regTransacao .= $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["codigo_carteira"], 2 ) . // Carteira - tamanho 2 / 107-108
+				"01" . // COMANDO VIDE MANUAL - tamanho 2 / 109-110
+				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["tipo_cobranca"] , 1 ) .
+				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["fk_pedido"], 9 ) . // Seu Número/Número do Título Atribuído pelo Cedente - TAMANHO 10 / 111-120 NUM
 				$data_vencimento->format ( 'dmy' ) . // DATA VENCIMENTO TITULO - TAMANHO 6 / 121-126 NUM
 	
 				$valor . // VALOR DO TÍTULO - TAMANHO 13 / 127-139 NUM
@@ -685,7 +690,8 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["primeira_instrucao_codificada"], 2 ) . // tamanho 2 / 157-158
 				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["segunda_instrucao_codificada"], 2 ) . // tamanho 2 / 159-160
 				$valor_mora . // VALOR ACRESC POR DIA DE ATRASO - TAMANHO 13 / 161-173 NUM
-				$data_limite_desconto->format ( 'dmy' ) . // DATA LIMITE PARA CONCESSÃO DESCONTO - TAMANHO 6 / 174-179 NUM
+				$this->gerarEspacosZeros ( 6 ) .
+// 				$data_limite_desconto->format ( 'dmy' ) . // DATA LIMITE PARA CONCESSÃO DESCONTO - TAMANHO 6 / 174-179 NUM
 				$valor_desconto_boleto . // VALOR DESCONTO - TAMANHO 13 / 180-192 NUM
 				$valor_iof . // VALOR IOF - TAMANHO 13 / 192-205 NUM
 				$valor_abatimento . // VALOR ABATIMENTO A SER CONCEDIDO/CANCELADO - TAMANHO 13 / 206-218 NUM
@@ -695,12 +701,16 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 	
 				$this->brancosDireita ( $lstTransacoes [($_i - 1)] ["nome_pagador"], 37 ) . // NOME PAGADOR - TAMANHO 37 / 235-271 ALFA
 				$this->gerarEspacosBrancos ( 3 ) . // tamanho 6 / 272-274
-				$this->gerarEspacosBrancos ( 40 ) . // ENDEREÇO COMPLETO - TAMANHO 40 / 275-314 ALFA
-				$this->gerarEspacosBrancos ( 12 ) . // Bairro pagador - TAMANHO 12 / 315-326 ALFA
+				$this->brancosDireita($lstTransacoes [($_i - 1)] ["logradouro_pagador"]. " " . $lstTransacoes [($_i - 1)] ["numero_end_pagador"]. " " . $lstTransacoes [($_i - 1)] ["complemento_end_pagador"], 40) .
+// 				$this->gerarEspacosBrancos ( 40 ) . // ENDEREÇO COMPLETO - TAMANHO 40 / 275-314 ALFA
+				$this->brancosDireita($lstTransacoes [($_i - 1)] ["bairro_pagador"], 12) .
+// 				$this->gerarEspacosBrancos ( 12 ) . // Bairro pagador - TAMANHO 12 / 315-326 ALFA
 				$prefixo_cep_pagador . // CEP PAGADOR - TAMANHO 5 / 327-331 NUM
 				$sufixo_cep_pagador . // SUFIXO CEP - TAMANHO 3 / 332-334 NUM
-				$this->gerarEspacosBrancos ( 15 ) . // CIDADE PAGADOR - TAMANHO 15 / 335-349 ALFA
-				$this->gerarEspacosBrancos ( 2 ) . // uf PAGADOR - TAMANHO 2 / 350-351 ALFA
+				$this->brancosDireita($lstTransacoes [($_i - 1)] ["cidade_pagador"], 15) .
+// 				$this->gerarEspacosBrancos ( 15 ) . // CIDADE PAGADOR - TAMANHO 15 / 335-349 ALFA
+				$this->brancosDireita($lstTransacoes [($_i - 1)] ["uf_pagador"], 2) .
+// 				$this->gerarEspacosBrancos ( 2 ) . // uf PAGADOR - TAMANHO 2 / 350-351 ALFA
 				$this->gerarEspacosBrancos ( 40 ) . // MENSAGEM AO PAGADOR - TAMANHO 2 / 352-391 ALFA
 				$this->gerarEspacosBrancos ( 2 ) . // NÚMERO DE DIAS PARA PROTESTO CASO “Comando” = 01 E “instrução codificada” = 06 - TAMANHO 2 / 392-393 ALFA
 				$this->gerarEspacosBrancos ( 1 ) . // BRANCOS - TAMANHO 2 / 350-351 ALFA
@@ -1091,6 +1101,23 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		$result = $this->banco->getConexaoBanco ()->query ( $sql );
 // 		$result->close ();
 // 		return $total;
+	}
+	
+	public function getTransacaoByNossoNumero($cod_empresa, $origem, $fk_pagamento){
+		$sql = "SELECT transacao.nome_pagador FROM TRANSACAO
+					LEFT OUTER JOIN forma_pagamento_operadora_empresa ON transacao.fk_forma_pagamento_operadora_empresa = forma_pagamento_operadora_empresa.id_forma_pagamento_operadora_empresa
+					LEFT OUTER JOIN operadora_empresa ON forma_pagamento_operadora_empresa.fk_operadora_empresa = operadora_empresa.id_operadora_empresa
+					INNER JOIN empresa ON operadora_empresa.fk_empresa = empresa.CODIGO
+				WHERE empresa.CODIGO = $cod_empresa AND transacao.tipo_cobranca = $origem AND transacao.fk_pedido_pagamento = $fk_pagamento
+					ORDER BY transacao.id_transacao";
+		// echo "<br>".$sql."<br>";
+		$consulta = $this->banco->getConexaoBanco ()->query ( $sql );
+		$lstPgto = array ();
+		while ( $linha = $consulta->fetch_array ( MYSQLI_ASSOC ) ) {
+			array_push ( $lstPgto, $linha );
+		}
+		$consulta->close ();
+		return $lstPgto[0];
 	}
 }
 	

@@ -53,36 +53,34 @@
 			</div>
 			<div class="modal-body">
 				<p>Selecione o arquivo enviado pelo banco...</p>
-				<form id="formulario" role="form" method="post" enctype="multipart/form-data">
-					<div class="form-group">
-<!-- 					    <label for="exampleInputFile">Arquivo de retorno</label> -->
-<!-- 					    <input type="file" id="arquivoRetorno"> -->
-<!-- 						<p class="help-block">Extensão .ret</p> -->
+				<form class="form-inline" id="formulario" role="form" method="post" enctype="multipart/form-data">
+					<div class="row">
+						<div class="col-md-4">
+							<input type="text" name="servico" value="carregarRetorno" class="hidden" />
+		  					<label for="exampleInputFile">Arquivo de retorno</label>
+		  					<input id="arquivo" name="arquivo" type="file" accept=".RET" required="required"/>
+						</div>
+						<div class="col-md-6">
+							<button type="button" class="btn btn-default" onclick="carregarRetorno()">Carregar</button>
+						</div>
+					</div>
+					<br>
+					<div id="tableRetorno" class="row">
 						
-						<input type="text" name="servico" value="processarRetorno" class="hidden" />
-						<label for="exampleInputFile">Arquivo de retorno</label>
-					    <input name="arquivo" type="file" accept=".RET"/>
-					    <p class="help-block">Extensão .ret</p>
-					    <button>Enviar</button>
 					</div>
 				</form>
-				
-				
-<!-- 				<form id="formulario" method="post" enctype="multipart/form-data"> -->
-<!-- 				    <input type="text" name="servico" value="processarRetorno" class="hidden" /> -->
-<!-- 				    <input name="arquivo" type="file" accept=".RET"/> -->
-<!-- 				    <button>Enviar</button> -->
-<!-- 				</form> -->
 			</div>
-<!-- 			<div class="modal-footer"> -->
-<!-- 				<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button> -->
-<!--				<button type="button" class="btn btn-primary" onclick="processarRetorno()">Processar</button> -->
-<!-- 			</div> -->
+			<div class="modal-footer">
+				<button id="btnProcessarRetorno" type="button" class="btn btn-primary hidden" onclick="processarRetorno()">Processar</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+			</div>
 		</div>
 	</div>
 </div>
 
 <script type="text/javascript">
+	var listaRegistros;
+	
 	$('#modalRemessa').on('show.bs.modal', function () {
 	  	$('.modal-body').css('overflow-y', 'auto'); 
 	  	$('#datepicker').focus();
@@ -104,30 +102,129 @@
 	    autoclose: true
 	});
 
+	function carregarRetorno(){
+		if ($('#arquivo').val() != "")
+			$("#formulario").submit();
+		else
+			alert("Selecione o arquivo retorno enviado pelo banco!");
+	}
+
+	function processarRetorno(){
+		console.log(JSON.stringify(listaRegistros));
+		$.ajax({
+	    	url : "../controllers/retornoController.php",
+	        type: 'POST',
+	        data: {
+		        servico: "processarTransacoes",
+		        lstTransacoes: JSON.stringify(listaRegistros)
+	        },
+	        success: function (data) {
+		        console.log("Retornou: " + data);
+	        }
+	    });
+	}
+	
 	$("#formulario").submit(function () {
 	    var formData = new FormData(this);
 
 	    $.ajax({
 	    	url : "../controllers/retornoController.php",
-// 	        url: window.location.pathname,
 	        type: 'POST',
 	        data: formData,
 	        success: function (data) {
 	            console.log(data);
+	            var obj = JSON.parse(data);
+	            console.log(obj);
+	            listaRegistros = obj;
+    			if (obj.length == 0){
+        			
+    				$("#tableRetorno").html("<table id=\"transacoes\" class=\"table table-hover table-striped \"><tr><td colspan='12' align='center'>Nenhum Registro encontrado!</td></tr></tbody></table>");
+    				$("#btnProcessarRetorno").addClass("hidden");
+        		}else{
+    				$("#tableRetorno").html(construirLista(obj));
+    				$("#btnProcessarRetorno").removeClass("hidden");
+        		}
 	        },
 	        cache: false,
 	        contentType: false,
-	        processData: false,
-	        xhr: function() {  // Custom XMLHttpRequest
-	            var myXhr = $.ajaxSettings.xhr();
-	            if (myXhr.upload) { // Avalia se tem suporte a propriedade upload
-	                myXhr.upload.addEventListener('progress', function () {
-// 	                    console.log(".");
-	                }, false);
-	            }
-	        	return myXhr;
-	        }
+	        processData: false
 	    });
 	    return false;
 	});
+
+	function construirLista(obj){
+		var table = "<table id=\"transacoes\" class=\"table table-hover table-striped \">" +
+						"<thead>" +
+						"<tr>" +
+							"<th class=\"col-md-1\"><center>NOSSO NÚMERO</center></th>" +
+							"<th class=\"col-md-1\"><center>NOME</center></th>" +
+							"<th class=\"col-md-1\"><center>VENCIMENTO</center></th>" +
+							"<th class=\"col-md-1\"><center>VALOR</center></th>" +
+							"<th class=\"col-md-1\"><center>PAGAMENTO</center></th>" +
+							"<th class=\"col-md-1\"><center>V. PAGO</center></th>" +
+							"<th class=\"col-md-1\"><center>CRÉDITO</center></th>" +
+							"<th class=\"col-md-1\"><center>DESCRIÇÃO</center></th>" +
+// 							"<th class=\"col-md-1\"><center></center></th>" +
+						"</tr>" +
+					"</thead>" +
+					"<tbody id=\"conteudo-relatorio\">";
+    	
+    	var trs = "";
+    	for (i in obj){
+        	
+    		trs += "<tr class=\"linha_relatorio\">" +
+						"<td class=\"col-md-1 valign\"><center>" + obj[i].nosso_numero + "</center></td>" +
+						"<td class=\"col-md-1 valign\"><center>" + obj[i].nome_pagador + "</center></td>" +
+						"<td class=\"col-md-1 valign\"><center>";
+				    		if (obj[i].data_vencimento){
+				    			var from = obj[i].data_vencimento.split("/");
+				    			var dt = new Date(from[2], from[1] - 1, from[0]);
+				            	var d, m;
+				            	if (dt.getDate() <= 9) d = "0" + dt.getDate(); else d = dt.getDate();
+				            	if ((dt.getMonth()+1) <= 9) m = "0" + (dt.getMonth()+1); else m = dt.getMonth()+1;
+				            	trs +=  d + "/" + m + "/" + dt.getFullYear();
+							} 
+						trs += "</center></td>" +
+						"<td class=\"col-md-1 valign\"><center>R$ " + obj[i].valor_titulo + "</center></td>" +
+						"<td class=\"col-md-1 valign\"><center>";
+				    		if (obj[i].data_pagamento){
+				    			var from = obj[i].data_pagamento.split("/");
+				    			var dt = new Date(from[2], from[1] - 1, from[0]);
+				            	var d, m;
+				            	if (dt.getDate() <= 9) d = "0" + dt.getDate(); else d = dt.getDate();
+				            	if ((dt.getMonth()+1) <= 9) m = "0" + (dt.getMonth()+1); else m = dt.getMonth()+1;
+				            	trs +=  d + "/" + m + "/" + dt.getFullYear();
+							} 
+						trs += "</center></td>" +
+						"<td class=\"col-md-1 valign\"><center>R$ " + obj[i].valor_pago + "</center></td>" +
+						"<td class=\"col-md-1 valign\"><center>";
+				    		if (obj[i].data_credito){
+				    			var from = obj[i].data_credito.split("/");
+				    			var dt = new Date(from[2], from[1] - 1, from[0]);
+				            	var d, m;
+				            	if (dt.getDate() <= 9) d = "0" + dt.getDate(); else d = dt.getDate();
+				            	if ((dt.getMonth()+1) <= 9) m = "0" + (dt.getMonth()+1); else m = dt.getMonth()+1;
+				            	trs +=  d + "/" + m + "/" + dt.getFullYear();
+							} 
+						trs += "</center></td>" +
+						"<td class=\"col-md-1 valign\"><center>" + obj[i].comando + " - " + obj[i].descricao_comando + "</center></td>" +
+// 						"<td class=\"col-md-1 valign\"><center>";
+// 							if (obj[i].pago){
+// 								trs += "<button type=\"button\"" +
+// 									"class=\"btn btn-success dropdown-toggle\"" +
+// 									"data-toggle=\"dropdown\"" +
+// 									"data-idt=\"1\"" +
+// 									"onclick=\"imprimirBoleto(this)\">Liquidar</button>";
+// 							}else{
+// 								trs += "--";
+// 							}
+						
+// 							trs += "</center>" + 
+// 						"</td>" +
+					"</tr>";
+			
+    	}
+    	table += trs + "</tbody></table>";
+    	return table;
+	}
 </script>

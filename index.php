@@ -1,6 +1,6 @@
 <?php 
 	session_start(); 
-	if (isset($_SESSION["id_usuario"])) header("location:iboltpag/buscardados_transacao.php"); 
+	if (isset($_SESSION["id_usuario"])) header("location:modulos.php"); 
 ?>
 <!DOCTYPE HTML>
 <html lang="pt-br">

@@ -1,5 +1,6 @@
 <?php
 	session_start();
+	if (isset($_SESSION["id_usuario"])) header("location:views/home.php");
     //date_default_timezone_set('America/Sao_Paulo');
     //print_r($_SESSION);
 ?>

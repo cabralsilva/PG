@@ -219,3 +219,7 @@ form{
 .tab-principal{
 	font-size: 18px !important;
 }
+
+.modal-dialog{
+	width: 70% !important;
+}

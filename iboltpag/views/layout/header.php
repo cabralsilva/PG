@@ -15,7 +15,6 @@
 				<li><a href="formtransacao.php">Gerar Boleto</a></li>
 				<li><a href="#modalRemessa" data-toggle="modal" data-target="#modalRemessa">Gerar remessa</a></li>
 				<li><a href="#modalRetorno" data-toggle="modal" data-target="#modalRetorno">Processar retorno</a></li>
-				<li><a href="#tallModal" data-toggle="modal" data-target="#tallModal">modal</a></li>
 				<li role="separator" class="divider"></li>
 				<li><a href="../../modulos.php">Sistemas</a></li>
 				<li><a href="../../logout.php">Logout</a></li>

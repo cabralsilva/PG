@@ -540,24 +540,26 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 					$sequencial = $this->getSequencial ( $lstTransacoes [0] ["id_operadora_empresa"] );
 					$lstTransacoes [$chave] ["num_sequencial_remessa"] = $sequencial ["num_sequencial_remessa"];
 				} else {
-					$this->remontarRemessaBancodoBrasil400 ( $lstTransacoes );
+					$this->remontarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa );
 					array_push ( $retorno, 3 );
 					array_push ( $retorno, $lstTransacoes [0] ["nome_arquivo"] );
+					array_push ( $retorno, $empresa );
 					return $retorno;
 					break;
 				}
 			}
-			$nomeArquivo = $this->gerarRemessaBancodoBrasil400 ( $lstTransacoes );
+			$nomeArquivo = $this->gerarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa );
 			array_push ( $retorno, 1 );
 			array_push ( $retorno, $nomeArquivo );
+			array_push ( $retorno, $empresa );
 			return $retorno;
 		} else
 			return null;
 	}
 	
-	public function montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual ){
+	public function montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual, $empresa ){
 		//ELIMINA OS ARQUIVO SALVOS NA APLICAÇÃO QUE FORAM CRIADOS A MAIS DE UM MINUTO		
-		foreach (glob("*.REM") as $file) {
+		foreach (glob($empresa."/*.REM") as $file) {
 			$modificado = new DateTime(date("Y-m-d\TH:i:s", filemtime($file)));
 			$atual = new DateTime();
 			$diff = $atual->diff($modificado);
@@ -730,14 +732,14 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		return $conteudo;
 			
 	}
-	public function gerarRemessaBancodoBrasil400($lstTransacoes) {
+	public function gerarRemessaBancodoBrasil400($lstTransacoes, $empresa) {
 		$sequencial = $this->getSequencial ( $lstTransacoes [0] ["id_operadora_empresa"] );
 		
 		$dia = date ( 'd' );
 		$mes = date ( 'm' );
 		$seq = $this->zerosEsquerda ( dechex ( $lstTransacoes [0] ["num_sequencial_remessa"] ), 2 );
 		$nome = "BB$dia$mes$seq.REM";
-		$fp = fopen ( $nome, "w" );
+		$fp = fopen ( $empresa."/".$nome, "w" );
 		
 		$dataAtual = date ( 'dmy' );
 		$escreve = fwrite ( $fp, $this->montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual ) );
@@ -748,12 +750,12 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		$this->updateTransacaoRemessa ( $lstTransacoes, $dataAtual, $nome, $lstTransacoes [0] ["num_sequencial_remessa"] );
 		return $nome;
 	}
-	public function remontarRemessaBancodoBrasil400($lstTransacoes) {
+	public function remontarRemessaBancodoBrasil400($lstTransacoes, $empresa) {
 		$nome = $lstTransacoes [0] ["nome_arquivo"];
-		$fp = fopen ( $nome, "w" );
+		$fp = fopen ( $empresa."/".$nome, "w" );
 		
 		$dataAtual = date ( 'dmy' );
-		$escreve = fwrite ( $fp, $this->montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual ) );
+		$escreve = fwrite ( $fp, $this->montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual, $empresa ) );
 		// Fecha o arquivo
 		fclose ( $fp );
 		

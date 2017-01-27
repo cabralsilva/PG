@@ -27,7 +27,7 @@ function gerarRemessa(baseProjeto) {
 								break;
 							case 1:
 								var link = document.createElement('a');
-		        				link.href = baseProjeto + "/controllers/"+obj[1];
+		        				link.href = baseProjeto + "/controllers/"+obj[2]+"/"+obj[1];
 		        				link.download = obj[1];
 		        				document.body.appendChild(link);
 		        				link.click();
@@ -38,8 +38,7 @@ function gerarRemessa(baseProjeto) {
 							case 3:
 								alert("Um arquivo remessa já foi gerado nesta data. O mesmo arquivo será gerado novamente!");
 								var link = document.createElement('a');
-								link.href = baseProjeto + "/controllers/"
-										+ obj[1];
+								link.href = baseProjeto + "/controllers/"+obj[2]+"/"+obj[1];
 								link.download = obj[1];
 								document.body.appendChild(link);
 								link.click();

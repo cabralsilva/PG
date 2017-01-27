@@ -1,5 +1,11 @@
-<?php 
+<?php
+	// server should keep session data for AT LEAST 1 hour
+// 	ini_set('session.gc_maxlifetime', 10);
+	
+	// each client should remember their session id for EXACTLY 1 hour
+// 	session_set_cookie_params(10);
 	session_start(); 
+	
 	if (isset($_SESSION["id_usuario"])) header("location:modulos.php"); 
 ?>
 <!DOCTYPE HTML>

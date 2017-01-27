@@ -976,6 +976,13 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 				$(".iconmorefinfocartoespendentes-" + idPagamento).addClass('glyphicon-plus').removeClass('glyphicon-minus');
 		  	});
 		});
+// 		$(window).on('beforeunload', function() {
+// 		    return 'Your own message goes here...';
+// 		    alert("Teste");
+// 		});
+// 		function teste(){
+// 			alert("Teste");
+// 		}
 	</script>
 </body>
 </html>

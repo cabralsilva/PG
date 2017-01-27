@@ -1,4 +1,5 @@
 ﻿<?php
+	
 	session_start();
 	include("Banco.php");
 	$banco = new BancoDados();

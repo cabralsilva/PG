@@ -5,7 +5,7 @@ function gerarRemessa(baseProjeto) {
 	$("#selecaoOperadoraRemessa option:selected").each(function(ind, elem) {
 		operadoras += elem.value;
 	});
-	console.log(operadoras);
+//	console.log(operadoras);
 	$
 			.ajax({
 				async : true,

@@ -67,6 +67,7 @@
 		elseif($_POST["servico"] == "buscarBoletosFiltro") buscarBoletosFiltro();
 		elseif($_POST["servico"] == "gerarRemessa") gerarRemessa();
 		elseif($_POST["servico"] == "gerarRemessaDia") gerarRemessaDia();
+		elseif($_POST["servico"] == "prepararBaixa") prepararBaixa();
 	}else{
 		//echo "SERVICO NÃO CATALOGADO";
 	}
@@ -81,4 +82,15 @@
 		if($_POST["banco"] == 3) $retorno = $ts->gerarRemessaBradescos400Dia($dataI, $dataF, $_POST["banco"], $_SESSION["dados_acesso"][0]["CODIGO"]);
 		elseif($_POST["banco"] == 4) $retorno = $ts->gerarRemessaBancodoBrasil400Dia($dataI, $dataF, $_POST["banco"], $_SESSION["dados_acesso"][0]["CODIGO"]);
 		echo json_encode($retorno);
+	}
+	
+	function prepararBaixa(){
+		$ts = new TransacaoService();
+		$transacaoPai = $ts->getTransacao($_POST["id_transacao"]);
+		if ($transacaoPai){
+			print_r($ts->insertTransactionBaixa($transacaoPai));
+// 			echo "\n\nEncontrou";
+		}
+		
+// 		print_r($_POST);//"Testes de conexão de arquivos php";
 	}

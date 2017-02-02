@@ -1,7 +1,7 @@
 <span class="nome-empresa"><?php echo $_SESSION["dados_acesso"][0]["NOME"] ?></span>
 <span class="nome-pagina"> <?= Page ?></span> <span class="usuario">
 	<div align="right">Funcionário logado: <?php echo $_SESSION["dados_acesso"][0]["nome_usuario"]?>
-	    	<div class="btn-group">
+    	<div class="btn-group">
 			<button type="button" class="btn btn-success dropdown-toggle"
 				data-toggle="dropdown" aria-haspopup="true"
 				aria-expanded="false">

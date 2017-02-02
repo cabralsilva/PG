@@ -13,9 +13,11 @@ function processarBoleto($retorno){
 		$dataV = $dataV->format ( 'd/m/y' );
 		$dataB = new DateTime ( $retorno ["Model"] ["data_hora_pedido"] );
 		$dataB = $dataB->format ( 'd/m/y' );
-		$valor_boleto = str_replace ( ".", ",", $retorno ["Model"] ["valor_transacao"] );
-	
-		$dadosboleto ["nosso_numero"] = zerosEsquerda ( $retorno ["Model"] ["num_convenio_banco_brasil"], 7 ) . zerosEsquerda ( $retorno ["Model"] ["fk_pedido_pagamento"], 10 );
+		$valor_boleto = number_format($retorno ["Model"] ["valor_transacao"],2,",",".");
+		//$valor_boleto = str_replace ( ".", ",", $retorno ["Model"] ["valor_transacao"] );
+		
+		
+		$dadosboleto ["nosso_numero"] = zerosEsquerda ( $retorno ["Model"]  ["id_origem"] , 1 ) . zerosEsquerda ( $retorno ["Model"] ["fk_pedido_pagamento"], 9 );
 		$dadosboleto ["numero_documento"] = zerosEsquerda ( $retorno ["Model"] ["fk_pedido"], 10 ); // Num do pedido ou do documento
 		$dadosboleto ["data_vencimento"] = $dataV; // Data de Vencimento do Boleto - REGRA: Formato DD/MM/AAAA
 		$dadosboleto ["data_documento"] = $dataB; // Data de emiss�o do Boleto
@@ -177,7 +179,7 @@ if (isset ( $_GET ["idT"] )) {
 		
 	}
 	$ts = new TransacaoService ();
-	$retorno = $ts->getTransacao ( $_GET ["idT"], $usr, $pwd );
+	$retorno = $ts->getTransacaoAut( $_GET ["idT"], $usr, $pwd );
 	processarBoleto($retorno);
 	
 } else {

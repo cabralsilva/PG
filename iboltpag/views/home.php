@@ -82,7 +82,7 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 												<td class="col-md-1 valign">
 													<center>
 													<?php
-											switch ($pagamento ["tipo_cobranca"]) {
+											switch ($pagamento ["id_origem"]) {
 												case "0" :
 													echo "Avulso";
 													break;
@@ -210,7 +210,7 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 																<tr class="success">
 																	<td class="col-md-4 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
 																	<td class="col-md-4 valign"><center><?= $pagamento["nome_pagador"]?></center></td>
-																	<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_pedido"])) ?></center></td>
+																	<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_transacao"])) ?></center></td>
 																</tr>
 															</tbody>
 														</table>
@@ -265,7 +265,7 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 															<td class="col-md-1 valign">
 																<center>
 																<?php
-														switch ($pagamento ["tipo_cobranca"]) {
+														switch ($pagamento ["id_origem"]) {
 															case "0" :
 																echo "Avulso";
 																break;
@@ -393,7 +393,7 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 																			<tr class="success">
 																				<td class="col-md-4 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
 																				<td class="col-md-4 valign"><center><?= $pagamento["nome_pagador"]?></center></td>
-																				<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_pedido"])) ?></center></td>
+																				<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_transacao"])) ?></center></td>
 																			</tr>
 																		</tbody>
 																	</table>
@@ -432,7 +432,7 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 															<td class="col-md-1 valign">
 																<center>
 																<?php
-														switch ($pagamento ["tipo_cobranca"]) {
+														switch ($pagamento ["id_origem"]) {
 															case "0" :
 																echo "Avulso";
 																break;
@@ -560,7 +560,7 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 																			<tr class="success">
 																				<td class="col-md-4 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
 																				<td class="col-md-4 valign"><center><?= $pagamento["nome_pagador"]?></center></td>
-																				<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_pedido"])) ?></center></td>
+																				<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_transacao"])) ?></center></td>
 																			</tr>
 																		</tbody>
 																	</table>
@@ -599,7 +599,7 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 															<td class="col-md-1 valign">
 																<center>
 																<?php
-														switch ($pagamento ["tipo_cobranca"]) {
+														switch ($pagamento ["id_origem"]) {
 															case "0" :
 																echo "Avulso";
 																break;
@@ -692,11 +692,19 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 															<td class="col-md-1 valign" align='right'>R$ <?php echo number_format($pagamento['valor_transacao'], 2, ',', '.'); ?></td>
 															<td class="col-md-1 valign" align='right'>R$ <?php echo number_format($pagamento['valor_transacao'], 2, ',', '.'); ?></td>
 															<td class="col-md-1 valign" align='right'>
-																<button type="button"
-																	class="btn btn-success dropdown-toggle"
-																	data-toggle="dropdown"
-																	data-idt="<?= $pagamento['id_transacao']?>"
-																	onclick="imprimirBoleto(this)">Boleto</button>
+																
+																<div class="btn-group">
+																<button type="button" class="btn btn-success dropdown-toggle"
+																	data-toggle="dropdown" aria-haspopup="true"
+																	aria-expanded="false">
+																	Opções <span class="caret"></span>
+																</button>
+																<ul class="dropdown-menu">
+																	<li><a data-idt="<?= $pagamento['id_transacao'] ?>" onclick="prepararBaixa(this)" href="#">Dar baixa</a></li>
+																	<li><a href="#">Protestar</a></li>
+																	
+																</ul>
+																</div>
 															</td>
 															<td class="col-md-1 valign alignright">
 																<center>
@@ -727,7 +735,7 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 																			<tr class="success">
 																				<td class="col-md-4 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
 																				<td class="col-md-4 valign"><center><?= $pagamento["nome_pagador"]?></center></td>
-																				<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_pedido"])) ?></center></td>
+																				<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_transacao"])) ?></center></td>
 																			</tr>
 																		</tbody>
 																	</table>
@@ -768,7 +776,7 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 												<td class="col-md-1 valign">
 													<center>
 													<?php
-											switch ($pagamento ["tipo_cobranca"]) {
+											switch ($pagamento ["id_origem"]) {
 												case "0" :
 													echo "Avulso";
 													break;
@@ -896,7 +904,7 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 																<tr class="success">
 																	<td class="col-md-4 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
 																	<td class="col-md-4 valign"><center><?= $pagamento["nome_pagador"]?></center></td>
-																	<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_pedido"])) ?></center></td>
+																	<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_transacao"])) ?></center></td>
 																</tr>
 															</tbody>
 														</table>
@@ -976,6 +984,22 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 				$(".iconmorefinfocartoespendentes-" + idPagamento).addClass('glyphicon-plus').removeClass('glyphicon-minus');
 		  	});
 		});
+
+		function prepararBaixa(elem){
+			console.log("Preparando arquivo para baixa");
+			$.ajax({
+		    	url : "../controllers/homeController.php",
+		        type: 'POST',
+		        data: {
+			        servico: "prepararBaixa",
+			        id_transacao: elem.getAttribute('data-idt')
+		        },
+		        success: function (data) {
+		            console.log(data);
+		        }
+		    });
+		    return false;
+		}
 // 		$(window).on('beforeunload', function() {
 // 		    return 'Your own message goes here...';
 // 		    alert("Teste");

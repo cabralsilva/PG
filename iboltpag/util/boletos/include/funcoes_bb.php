@@ -63,6 +63,7 @@ if ($dadosboleto["formatacao_convenio"] == "7") {
 	$nossonumero = formata_numero($dadosboleto["nosso_numero"],10,0);
 	$dv=modulo_11("$codigobanco$nummoeda$fator_vencimento$valor$livre_zeros$convenio$nossonumero$carteira");
 	$linha="$codigobanco$nummoeda$dv$fator_vencimento$valor$livre_zeros$convenio$nossonumero$carteira";
+	
   $nossonumero = $convenio.$nossonumero;
 	//N�o existe DV na composi��o do nosso-n�mero para conv�nios de sete posi��es
 }
@@ -93,6 +94,7 @@ if ($dadosboleto["formatacao_convenio"] == "6") {
 
 $dadosboleto["codigo_barras"] = $linha;
 $dadosboleto["linha_digitavel"] = monta_linha_digitavel($linha);
+// echo $dadosboleto["linha_digitavel"];
 $dadosboleto["agencia_codigo"] = $agencia_codigo;
 $dadosboleto["nosso_numero"] = $nossonumero;
 $dadosboleto["codigo_banco_com_dv"] = $codigo_banco_com_dv;
@@ -399,7 +401,8 @@ function monta_linha_digitavel($linha) {
     // 5. Campo composto pelo valor nominal pelo valor nominal do documento, sem
     // indicacao de zeros a esquerda e sem edicao (sem ponto e virgula). Quando se
     // tratar de valor zerado, a representacao deve ser 000 (tres zeros).
-    $campo5 = substr($linha, 5, 14);
+//     echo substr($linha, 5, 16);
+    $campo5 = substr($linha, 5, 16);
 
     return "$campo1 $campo2 $campo3 $campo4 $campo5"; 
 }

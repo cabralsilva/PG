@@ -661,7 +661,7 @@ do Pagador</b></div></TD></tr></tbody></table>
 			<td class="vencimento2">Vencimento</td>
 		</tr>
 		<tr class="campos">
-			<td class="local_pagto">QUALQUER BANCO AT&Eacute; O VENCIMENTO</td>
+			<td class="local_pagto">QUALQUER BANCO</td>
 			<td class="vencimento2"><?php echo $dadosboleto["data_vencimento"]?></td>
 		</tr>
 		</tbody>

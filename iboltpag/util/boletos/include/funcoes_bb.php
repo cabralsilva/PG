@@ -58,12 +58,24 @@ if ($dadosboleto["formatacao_convenio"] == "8") {
 
 // Carteira 18 com Conv�nio de 7 d�gitos
 if ($dadosboleto["formatacao_convenio"] == "7") {
+	echo "Convenio 7 P<br>";
 	$convenio = formata_numero($dadosboleto["convenio"],7,0,"convenio");
 	// Nosso n�mero de at� 10 d�gitos
 	$nossonumero = formata_numero($dadosboleto["nosso_numero"],10,0);
 	$dv=modulo_11("$codigobanco$nummoeda$fator_vencimento$valor$livre_zeros$convenio$nossonumero$carteira");
 	$linha="$codigobanco$nummoeda$dv$fator_vencimento$valor$livre_zeros$convenio$nossonumero$carteira";
+	echo "<br>Cod Banco: $codigobanco";
+	echo "<br>Num Moeda: $nummoeda";
+	echo "<br>Dig Verif: $dv";
+	echo "<br>Fator Ven: $fator_vencimento";
+	echo "<br>Valor	   : $valor";
+	echo "<br>Livre zer: $livre_zeros";
+	echo "<br>Convenio : $convenio";
+	echo "<br>Nosso Num: $nossonumero";
+	echo "<br>Carteira : $carteira";
+	echo "<br>Count CB : " . strlen($linha);
 	
+	echo "<br>";
   $nossonumero = $convenio.$nossonumero;
 	//N�o existe DV na composi��o do nosso-n�mero para conv�nios de sete posi��es
 }
@@ -91,6 +103,8 @@ if ($dadosboleto["formatacao_convenio"] == "6") {
 		$linha = "$codigobanco$nummoeda$dv$fator_vencimento$valor$convenio$nossonumero$nservico";
 	}
 }
+
+echo "Cod. Barras: $linha";
 
 $dadosboleto["codigo_barras"] = $linha;
 $dadosboleto["linha_digitavel"] = monta_linha_digitavel($linha);
@@ -218,6 +232,7 @@ function fator_vencimento($data) {
 	$ano = $data[2];
 	$mes = $data[1];
 	$dia = $data[0];
+	echo "<br>Dta: $dia / $mes / $ano <br>";
     return(abs((_dateToDays("1997","10","07")) - (_dateToDays($ano, $mes, $dia))));
 }
 

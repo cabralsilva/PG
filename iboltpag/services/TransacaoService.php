@@ -87,31 +87,31 @@ class TransacaoService {
 		$consulta->close ();
 		return $sequencial;
 	}
-	private function updateTransacaoRemessa($lstT, $dataArquivo, $nomeArquivo, $sequencial, $operadoraEmpresa) {
+	private function updateTransacaoRemessa($lstT, $dataArquivo, $nomeArquivo, $sequencial, $operadoraEmpresa, $idRemessa) {
 		$dataFormatada = date ( 'Y-m-d', strtotime ( $dataArquivo ) );
 		try {
-			$sql = "INSERT INTO remessas (
+			if ($idRemessa == 0){
+				$sql = "INSERT INTO remessas (
 						data_arquivo, sequencial_remessa, nome_arquivo, fk_operadora_empresa
 					)VALUES (
-						DATE '" . $dataFormatada . "', " . 
-						$sequencial . ", '" .
-						$nomeArquivo . "', " .
-						$operadoraEmpresa . "
+						DATE '" . $dataFormatada . "', " .
+										$sequencial . ", '" .
+										$nomeArquivo . "', " .
+										$operadoraEmpresa . "
 					)";
-		
 					if ($this->banco->getConexaoBanco ()->query ( $sql )) {
 						$id = $this->banco->getConexaoBanco ()->insert_id;
-
+					
 						foreach ( $lstT as $key => $value ) {
 							$sql = "UPDATE transacao SET " . "transacao.fk_remessa = " . $id . " WHERE transacao.id_transacao = " . $lstT [$key] ["id_transacao"];
 							$result = $this->banco->getConexaoBanco ()->query ( $sql );
 						}
-
-						$dataFormatada = date ( 'Y-m-d', strtotime ( $dataArquivo ) );
-						foreach ( $lstT as $key => $value ) {
-							$sql = "UPDATE transacao SET " . "transacao.sequencial_remessa = " . $sequencial . "," . "transacao.data_arquivo = '" . $dataFormatada . "'," . "transacao.nome_arquivo = '" . $nomeArquivo . "' " . "WHERE transacao.id_transacao = " . $lstT [$key] ["id_transacao"];
-							$result = $this->banco->getConexaoBanco ()->query ( $sql );
-						}
+					
+// 						$dataFormatada = date ( 'Y-m-d', strtotime ( $dataArquivo ) );
+// 						foreach ( $lstT as $key => $value ) {
+// 							$sql = "UPDATE transacao SET " . "transacao.sequencial_remessa = " . $sequencial . "," . "transacao.data_arquivo = '" . $dataFormatada . "'," . "transacao.nome_arquivo = '" . $nomeArquivo . "' " . "WHERE transacao.id_transacao = " . $lstT [$key] ["id_transacao"];
+// 							$result = $this->banco->getConexaoBanco ()->query ( $sql );
+// 						}
 						return array (
 								'CodStatus' => 1,
 								'Msg' => "Success!",
@@ -124,6 +124,30 @@ class TransacaoService {
 								'Msg' => "Falha ao inserir novo registro!"
 						);
 					}
+			}else{
+				$sql = "UPDATE remessas set remessas.sequencial_remessa = $sequencial WHERE remessas.id_remessa = $idRemessa";
+				if ($this->banco->getConexaoBanco ()->query ( $sql )) {
+					foreach ( $lstT as $key => $value ) {
+						$sql = "UPDATE transacao SET " . "transacao.fk_remessa = " . $idRemessa . " WHERE transacao.id_transacao = " . $lstT [$key] ["id_transacao"];
+						$result = $this->banco->getConexaoBanco ()->query ( $sql );
+					}
+						
+// 					$dataFormatada = date ( 'Y-m-d', strtotime ( $dataArquivo ) );
+// 					foreach ( $lstT as $key => $value ) {
+// 						$sql = "UPDATE transacao SET " . "transacao.sequencial_remessa = " . $sequencial . "," . "transacao.data_arquivo = '" . $dataFormatada . "'," . "transacao.nome_arquivo = '" . $nomeArquivo . "' " . "WHERE transacao.id_transacao = " . $lstT [$key] ["id_transacao"];
+// 						$result = $this->banco->getConexaoBanco ()->query ( $sql );
+// 					}
+					return array (
+							'CodStatus' => 1,
+							'Msg' => "Success!",
+							'Model' => $idRemessa
+					);
+				}
+				
+			}
+			
+		
+					
 		} catch ( Exception $e ) {
 // 			echo "\n\n$sql\n\n";
 			return array (
@@ -583,17 +607,31 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		$retorno = array ();
 		if (count ( $lstTransacoes ) > 0) {
 			foreach ( $lstTransacoes as $chave => $value ) {
-				if ($lstTransacoes [$chave] ["sequencial_remessa"] == "" || $lstTransacoes [$chave] ["sequencial_remessa"] == null) {
+				if (!$lstTransacoes [$chave] ["fk_remessa"]){
 					$sequencial = $this->getSequencial ( $lstTransacoes [0] ["id_operadora_empresa"] );
 					$lstTransacoes [$chave] ["num_sequencial_remessa"] = $sequencial ["num_sequencial_remessa"];
-				} else {
-					$this->remontarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa );
+				}else{
+					$this->remontarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa , $lstTransacoes[$chave]["fk_remessa"]);
 					array_push ( $retorno, 3 );
 					array_push ( $retorno, $lstTransacoes [0] ["nome_arquivo"] );
 					array_push ( $retorno, $empresa );
 					return $retorno;
 					break;
 				}
+				
+// 				if ($lstTransacoes [$chave] ["sequencial_remessa"] == "" || $lstTransacoes [$chave] ["sequencial_remessa"] == null) {
+// 					$sequencial = $this->getSequencial ( $lstTransacoes [0] ["id_operadora_empresa"] );
+// 					$lstTransacoes [$chave] ["num_sequencial_remessa"] = $sequencial ["num_sequencial_remessa"];
+// 				} else {
+// 					$this->remontarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa );
+// 					array_push ( $retorno, 3 );
+// 					array_push ( $retorno, $lstTransacoes [0] ["nome_arquivo"] );
+// 					array_push ( $retorno, $empresa );
+// 					return $retorno;
+// 					break;
+// 				}
+				
+				
 			}
 			$nomeArquivo = $this->gerarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa );
 			array_push ( $retorno, 1 );
@@ -827,10 +865,10 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		fclose ( $fp );
 		
 		$this->updateSequencial ( $lstTransacoes [0] ["num_sequencial_remessa"], $lstTransacoes [0] ["id_operadora_empresa"] );
-		$this->updateTransacaoRemessa ( $lstTransacoes, $dataAtual, $nome, $lstTransacoes [0] ["num_sequencial_remessa"] , $lstTransacoes [0] ["id_operadora_empresa"]);
+		$this->updateTransacaoRemessa ( $lstTransacoes, $dataAtual, $nome, $lstTransacoes [0] ["num_sequencial_remessa"] , $lstTransacoes [0] ["id_operadora_empresa"], 0);
 		return $nome;
 	}
-	public function remontarRemessaBancodoBrasil400($lstTransacoes, $empresa) {
+	public function remontarRemessaBancodoBrasil400($lstTransacoes, $empresa, $fkRemessa) {
 		$nome = $lstTransacoes [0] ["nome_arquivo"];
 		$fp = fopen ( $empresa."/".$nome, "w" );
 		
@@ -840,7 +878,7 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		fclose ( $fp );
 		
 		$this->updateSequencial ( $lstTransacoes [0] ["num_sequencial_remessa"], $lstTransacoes [0] ["id_operadora_empresa"] );
-		$this->updateTransacaoRemessa ( $lstTransacoes, $dataAtual, $nome, $lstTransacoes [0] ["num_sequencial_remessa"] , $lstTransacoes [0] ["id_operadora_empresa"] );
+		$this->updateTransacaoRemessa ( $lstTransacoes, $dataAtual, $nome, $lstTransacoes [0] ["num_sequencial_remessa"] , $lstTransacoes [0] ["id_operadora_empresa"], $fkRemessa );
 	}
 	
 	

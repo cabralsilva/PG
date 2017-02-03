@@ -11,7 +11,7 @@ function processarBoleto($retorno){
 		// DADOS DO BOLETO PARA O SEU CLIENTE
 		$dataV = new DateTime ( $retorno ["Model"] ["data_vencimento_boleto"] );
 		$dataV = $dataV->format ( 'd/m/y' );
-		$dataB = new DateTime ( $retorno ["Model"] ["data_hora_pedido"] );
+		$dataB = new DateTime ( $retorno ["Model"] ["data_hora_transacao"] );
 		$dataB = $dataB->format ( 'd/m/y' );
 		$valor_boleto = number_format($retorno ["Model"] ["valor_transacao"],2,",",".");
 		//$valor_boleto = str_replace ( ".", ",", $retorno ["Model"] ["valor_transacao"] );

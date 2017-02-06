@@ -58,25 +58,12 @@ if ($dadosboleto["formatacao_convenio"] == "8") {
 
 // Carteira 18 com Conv�nio de 7 d�gitos
 if ($dadosboleto["formatacao_convenio"] == "7") {
-	echo "Convenio 7 P<br>";
 	$convenio = formata_numero($dadosboleto["convenio"],7,0,"convenio");
 	// Nosso n�mero de at� 10 d�gitos
 	$nossonumero = formata_numero($dadosboleto["nosso_numero"],10,0);
 	$dv=modulo_11("$codigobanco$nummoeda$fator_vencimento$valor$livre_zeros$convenio$nossonumero$carteira");
 	$linha="$codigobanco$nummoeda$dv$fator_vencimento$valor$livre_zeros$convenio$nossonumero$carteira";
-	echo "<br>Cod Banco: $codigobanco";
-	echo "<br>Num Moeda: $nummoeda";
-	echo "<br>Dig Verif: $dv";
-	echo "<br>Fator Ven: $fator_vencimento";
-	echo "<br>Valor	   : $valor";
-	echo "<br>Livre zer: $livre_zeros";
-	echo "<br>Convenio : $convenio";
-	echo "<br>Nosso Num: $nossonumero";
-	echo "<br>Carteira : $carteira";
-	echo "<br>Count CB : " . strlen($linha);
-	
-	echo "<br>";
-  $nossonumero = $convenio.$nossonumero;
+  	$nossonumero = $convenio.$nossonumero;
 	//N�o existe DV na composi��o do nosso-n�mero para conv�nios de sete posi��es
 }
 
@@ -104,7 +91,6 @@ if ($dadosboleto["formatacao_convenio"] == "6") {
 	}
 }
 
-echo "Cod. Barras: $linha";
 
 $dadosboleto["codigo_barras"] = $linha;
 $dadosboleto["linha_digitavel"] = monta_linha_digitavel($linha);
@@ -176,10 +162,21 @@ $altura = 50 ;
 
 //   print_r( $_SERVER);
 //Guarda inicial
-?><img src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/p.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
-src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/b.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
-src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/p.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
-src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/b.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
+?>
+
+<div class="linha-cb-preta" style="border-left: <?= $fino?>px solid;"></div>
+<div class="linha-cb-branca" style="border-left: <?= $fino?>px solid;"></div>
+<div class="linha-cb-preta" style="border-left: <?= $fino?>px solid;"></div>
+<div class="linha-cb-branca" style="border-left: <?= $fino?>px solid;"></div>
+<!-- <div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div> -->		
+		
+		
 <?php
 $texto = $valor ;
 if((strlen($texto) % 2) <> 0){
@@ -198,7 +195,7 @@ while (strlen($texto) > 0) {
       $f1 = $largo ;
     }
 ?>
-    src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/p.png width=<?php echo $f1?> height=<?php echo $altura?> border=0><img 
+	<div class="linha-cb-preta" style="border-left: <?= $f1?>px solid;"></div>
 <?php
     if (substr($f,$i,1) == "0") {
       $f2 = $fino ;
@@ -206,16 +203,18 @@ while (strlen($texto) > 0) {
       $f2 = $largo ;
     }
 ?>
-    src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/b.png width=<?php echo $f2?> height=<?php echo $altura?> border=0><img 
+	<div class="linha-cb-branca" style="border-left: <?= $f2?>px solid;"></div>
 <?php
   }
 }
 //echo dirname(".");
 // Draw guarda final
 ?>
-src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/p.png width=<?php echo $largo?> height=<?php echo $altura?> border=0><img 
-src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/b.png width=<?php echo $fino?> height=<?php echo $altura?> border=0><img 
-src=http://<?= $_SERVER["HTTP_HOST"] ?>/sii/iboltpag/util/boletos/imagens/p.png width=<?php echo 1?> height=<?php echo $altura?> border=0> 
+
+<div class="linha-cb-preta" style="border-left: <?= $largo?>px solid;"></div>
+<div class="linha-cb-branca" style="border-left: <?= $fino?>px solid;"></div>
+<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+
   <?php
 } //Fim da fun��o
 
@@ -232,8 +231,13 @@ function fator_vencimento($data) {
 	$ano = $data[2];
 	$mes = $data[1];
 	$dia = $data[0];
-	echo "<br>Dta: $dia / $mes / $ano <br>";
-    return(abs((_dateToDays("1997","10","07")) - (_dateToDays($ano, $mes, $dia))));
+	
+	$dataBase = new DateTime( date("d/m/Y", strtotime("07/10/1997")));
+	$dataVencimento = new DateTime("$ano-$mes-$dia");
+	$intervalo = $dataVencimento->diff( $dataBase );
+	
+//     return(abs((_dateToDays("1997","10","07")) - (_dateToDays($ano, $mes, $dia))));
+    return $intervalo->format('%a');
 }
 
 function _dateToDays($year,$month,$day) {
@@ -417,7 +421,7 @@ function monta_linha_digitavel($linha) {
     // indicacao de zeros a esquerda e sem edicao (sem ponto e virgula). Quando se
     // tratar de valor zerado, a representacao deve ser 000 (tres zeros).
 //     echo substr($linha, 5, 16);
-    $campo5 = substr($linha, 5, 16);
+    $campo5 = substr($linha, 5, 14);
 
     return "$campo1 $campo2 $campo3 $campo4 $campo5"; 
 }

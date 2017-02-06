@@ -49,7 +49,7 @@
 
 * {
 	font-family: Arial;
-	font-size: 12px;
+	font-size: 0px;
 	margin: 0;
 	padding: 0;
 }
@@ -491,7 +491,30 @@ div.barcode {
 	overflow: hidden;
 }
 
+
+
 }
+.linha-cb-preta {
+  height: 50px;/*Altura da linha*/
+/*   border-left: 1px solid;Adiciona borda esquerda na div como ser fosse uma linha. */
+  border-color: black !important;
+  display:inline-block;
+/*   margin-left: -4px; */
+/*   font-size: 0px; */
+}
+
+.linha-cb-branca {
+  height: 50px;/*Altura da linha*/
+/*   border-left: 1px solid;Adiciona borda esquerda na div como ser fosse uma linha. */
+  border-color: white !important;
+  display:inline-block;
+/*   margin-left: -4px; */
+/* font-size: 0px; */
+}
+
+p, h2 {
+  margin: 0;
+} 
 
 </STYLE>
 

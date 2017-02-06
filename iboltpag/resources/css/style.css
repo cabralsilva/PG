@@ -220,6 +220,22 @@ form{
 	font-size: 18px !important;
 }
 
+.linha-cb-preta {
+  height: 50px;/*Altura da linha*/
+/*   border-left: 1px solid;Adiciona borda esquerda na div como ser fosse uma linha. */
+  border-color: black !important;
+  display:inline-block;
+  margin-left: -4px;
+}
+
+.linha-cb-branca {
+  height: 50px;/*Altura da linha*/
+/*   border-left: 1px solid;Adiciona borda esquerda na div como ser fosse uma linha. */
+  border-color: white !important;
+  display:inline-block;
+  margin-left: -4px;
+}
+
 .modal-dialog{
 	width: 70% !important;
 }

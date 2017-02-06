@@ -692,18 +692,20 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 															<td class="col-md-1 valign" align='right'>R$ <?php echo number_format($pagamento['valor_transacao'], 2, ',', '.'); ?></td>
 															<td class="col-md-1 valign" align='right'>R$ <?php echo number_format($pagamento['valor_transacao'], 2, ',', '.'); ?></td>
 															<td class="col-md-1 valign" align='right'>
-																
+
 																<div class="btn-group">
-																<button type="button" class="btn btn-success dropdown-toggle"
-																	data-toggle="dropdown" aria-haspopup="true"
-																	aria-expanded="false">
-																	Opções <span class="caret"></span>
-																</button>
-																<ul class="dropdown-menu">
-																	<li><a data-idt="<?= $pagamento['id_transacao'] ?>" onclick="prepararBaixa(this)" href="#">Dar baixa</a></li>
-																	<li><a href="#">Protestar</a></li>
-																	
-																</ul>
+																	<button type="button"
+																		class="btn btn-success dropdown-toggle"
+																		data-toggle="dropdown" aria-haspopup="true"
+																		aria-expanded="false">
+																		Opções <span class="caret"></span>
+																	</button>
+																	<ul class="dropdown-menu">
+																		<li><a data-idt="<?= $pagamento['id_transacao'] ?>"
+																			onclick="prepararBaixa(this)" href="#">Dar baixa</a></li>
+																		<li><a href="#">Protestar</a></li>
+
+																	</ul>
 																</div>
 															</td>
 															<td class="col-md-1 valign alignright">
@@ -927,6 +929,242 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 		</div>
 		<div id="table-loading"></div>
 		<br> Obs.: .
+		<p>
+		
+		<br>
+		
+		
+		<p>
+		
+		
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
+		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
+		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
+		</p>
 	</div>
 	
 	<?php include 'layout/modais.php';?>

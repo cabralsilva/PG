@@ -30,9 +30,9 @@
 			
 			foreach($this->listPagamentosBoletosPendentes as $pagamentoBoletoPendente){
 				
-				if($pagamentoBoletoPendente["data_arquivo"] == null)
+				if(in_array($pagamentoBoletoPendente["fk_status"], [8, 11, 12]))
 					array_push($this->listPagamentosBoletosRemessaPendentes, $pagamentoBoletoPendente);
-				else //VERIFICIAR CONDIÇÃO PARA RETORNOS JÁ PROCESSADOS
+				elseif(in_array($pagamentoBoletoPendente["fk_status"], [1, 3, 5])) //VERIFICIAR CONDIÇÃO PARA RETORNOS JÁ PROCESSADOS
 					array_push($this->listPagamentosBoletosRetornoPendentes, $pagamentoBoletoPendente);
 			}
 		}

@@ -17,15 +17,104 @@ if (isset($_POST["servico"])){
 
 
 function processarRetorno(){
-	$array = json_decode($_POST["lstTransacoes"], true);
-	foreach($array as $chave => $value){
-		if ($array[$chave]["pago"] == "true"){
-			$ts = new TransacaoService();
-			$ts->liquidarPagamento($_SESSION["dados_acesso"][0]["CODIGO"], $array[$chave]["origem"], $array[$chave]["fk_pagamento"], $array[$chave]["data_pagamento"], $array[$chave]["valor_pago"]);
-		}else {
-			echo "\n".$array[$chave]["nosso_numero"];
+	$registro = json_decode($_POST["lstTransacoes"], true);
+	print_r($_POST["lstTransacoes"]);
+	$ts = new TransacaoService();
+	
+	foreach($registro as $chave => $value){
+		if ($registro[$chave]["comando"] == "02"){//Confirmada entrada de título
+			$ts->updateStatusTransactionReturn($registro[$chave], 2);
+			unset($registro[$chave]);
 		}
-		
+	}
+	
+	foreach($registro as $chave => $value){	
+		switch ($registro[$chave]["comando"]){
+			case "03":
+				break;
+			case "05":
+				break;
+			case "06"://Liquidação normal
+				$ts->updateStatusTransactionPaymentReturn($registro[$chave], 9);
+				break;
+			case "07":
+				break;
+			case "08":
+				break;
+			case "09":
+				break;
+			case "10"://Baixa solicitada
+				$ts->updateStatusTransactionReturn($registro[$chave], 4);
+				break;
+			case "11":
+				break;
+			case "12":
+				break;
+			case "13":
+				break;
+			case "14":
+				break;
+			case "15"://liquidação em cartório
+				$ts->liquidarPagamento($_SESSION["dados_acesso"][0]["CODIGO"], $registro[$chave]["origem"], $registro[$chave]["fk_pagamento"], $registro[$chave]["data_pagamento"], $array[$chave]["valor_pago"], 10);
+				break;
+			case "16":
+				break;
+			case "19":
+				break;
+			case "20":
+				break;
+			case "21":
+				break;
+			case "22":
+				break;
+			case "23"://Indicação de encaminhamento a cartório
+				$ts->updateStatusTransactionReturn($_SESSION["dados_acesso"][0]["CODIGO"], $registro[$chave]["origem"], $registro[$chave]["fk_pagamento"], 6);
+				break;
+			case "24":
+				break;
+			case "25":
+				break;
+			case "26":
+				break;
+			case "28":
+				break;
+			case "31":
+				break;
+			case "32":
+				break;
+			case "33":
+				break;
+			case "34":
+				break;
+			case "35":
+				break;
+			case "36":
+				break;
+			case "37":
+				break;
+			case "38":
+				break;
+			case "39":
+				break;
+			case "41":
+				break;
+			case "42":
+				break;
+			case "44":
+				break;
+			case "46":
+				break;
+			case "72":
+				break;
+			case "73":
+				break;
+			case "96":
+				break;
+			case "97":
+				break;
+			case "98":
+				break;
+		}
 	}
 }
 
@@ -40,11 +129,9 @@ function carregarRetorno(){
 		while ( ! feof ( $arquivoRetorno ) ) {
 			$linha = fgets ( $arquivoRetorno );
 			$tipoRegistro = substr ( $linha, 0, 1 );
-	
+			
 			if ($tipoRegistro === "0") {
 				// HEADER
-				// 			echo "\npercorrendo header: " . $linha;
-					
 				$agencia = substr ( $linha, 26, 4 );
 				$dg_agencia = substr ( $linha, 30, 1 );
 				$conta_corrente = substr ( $linha, 31, 8 );
@@ -65,6 +152,7 @@ function carregarRetorno(){
 				$fk_pagamento = ltrim(substr($nosso_numero, 1), '0');
 				$nosso_numero = $num_convenio.$nosso_numero;
 				$comando = substr($linha, 108, 2);
+				$id_transacao = substr($linha, 38, 25);
 				$nat_recebimento = substr($linha, 86, 2);
 				$data_vencimento = DateTime::createFromFormat('dmy', substr($linha, 146, 6));
 				$valor_titulo = ltrim(substr($linha, 152, 13), '0');
@@ -84,6 +172,9 @@ function carregarRetorno(){
 							
 				if (substr($linha, 175, 6) != "000000")
 					$transacao["data_credito"] = $data_vencimento->format("d/m/Y");
+				
+				$dataProcessamento = DateTime::createFromFormat('dmy', $data_arquivo_retorno);
+				$transacao["data_processamento"] = $dataProcessamento->format("d/m/Y");
 					
 				$transacao["nosso_numero"] = $nosso_numero;
 				$transacao["origem"] = $origem;
@@ -92,7 +183,7 @@ function carregarRetorno(){
 				$transacao["valor_pago"] = $valor_pago;
 				$transacao["comando"] = $comando;
 				$transacao["descricao_comando"] = comandoRetorno($comando);
-				$transacao["pago"] = "false";
+				$transacao["id_transacao"] = intval($id_transacao);
 				array_push($listRetorno, $transacao);
 								
 								
@@ -169,12 +260,6 @@ function validarSintaxeArquivo($arquivoRetorno) {
 				return false;
 			if ($seqRegis != "000001")
 				return false;
-// 			echo "\nTipo Op: $tipoOper";
-// 			echo "\nLite Op: $literaOp";
-// 			echo "\nTipo Se: $tipoServ";
-// 			echo "\nLite Se: $literaSe";
-// 			echo "\nBanc Id: $bancoIde";
-// 			echo "\nSeq Reg: $seqRegis\n";
 		} elseif ($tipoRegistro == "7") {
 // 			echo "Novo: $tipoRegistro\n";
 		} elseif ($tipoRegistro == "9") {

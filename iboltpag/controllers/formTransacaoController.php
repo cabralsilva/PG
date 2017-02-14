@@ -32,7 +32,7 @@
 		if ($retornoAutenticacao != null){
 			$retornoFP = $ts->getFormaPagamentoOperadoraEmpresa($retornoAutenticacao[0]["CODIGO"], $_POST["formaPagamento"], $_POST["operador"]);
 			if ($retornoFP["CodStatus"] == 1){
-				echo json_encode($ts->insertTransaction($_POST, $retornoFP["Model"]["id_forma_pagamento_operadora_empresa"]));
+				echo json_encode($ts->insertTransaction($_POST, $retornoFP["Model"]));
 			}else 
 				echo "Inconsistencia no cadastro referente a formas de pagamento e operadoras";
 		}else{

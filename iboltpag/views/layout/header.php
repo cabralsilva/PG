@@ -16,8 +16,8 @@
 				<li><a href="#modalRemessa" data-toggle="modal" data-target="#modalRemessa">Gerar remessa</a></li>
 				<li><a href="#modalRetorno" data-toggle="modal" data-target="#modalRetorno">Processar retorno</a></li>
 				<li role="separator" class="divider"></li>
-				<li><a href="../../modulos.php">Sistemas</a></li>
-				<li><a href="../../logout.php">Logout</a></li>
+				<li><a href="../../views/home.php">Sistemas</a></li>
+				<li><a href="../../views/logout.php">Logout</a></li>
 			</ul>
 		</div>
 	</div>

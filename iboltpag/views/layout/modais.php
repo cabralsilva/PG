@@ -110,7 +110,7 @@
 	}
 
 	function processarRetorno(){
-		console.log(JSON.stringify(listaRegistros));
+// 		console.log(JSON.stringify(listaRegistros));
 		$.ajax({
 	    	url : "../controllers/retornoController.php",
 	        type: 'POST',
@@ -132,9 +132,9 @@
 	        type: 'POST',
 	        data: formData,
 	        success: function (data) {
-	            console.log(data);
+// 	            console.log(data);
 	            var obj = JSON.parse(data);
-	            console.log(obj);
+// 	            console.log(obj);
 	            listaRegistros = obj;
     			if (obj.length == 0){
         			
@@ -185,18 +185,24 @@
 				            	trs +=  d + "/" + m + "/" + dt.getFullYear();
 							} 
 						trs += "</center></td>" +
-						"<td class=\"col-md-1 valign\"><center>R$ " + obj[i].valor_titulo + "</center></td>" +
+						"<td class=\"col-md-1 valign\"><center>R$ ";
+						obj[i].valor_titulo = parseFloat(obj[i].valor_titulo).toFixed(2);
+						trs += obj[i].valor_titulo.replace(".", ",") + "</center></td>" +
 						"<td class=\"col-md-1 valign\"><center>";
-				    		if (obj[i].data_pagamento){
-				    			var from = obj[i].data_pagamento.split("/");
-				    			var dt = new Date(from[2], from[1] - 1, from[0]);
-				            	var d, m;
-				            	if (dt.getDate() <= 9) d = "0" + dt.getDate(); else d = dt.getDate();
-				            	if ((dt.getMonth()+1) <= 9) m = "0" + (dt.getMonth()+1); else m = dt.getMonth()+1;
-				            	trs +=  d + "/" + m + "/" + dt.getFullYear();
-							} 
+							if (obj[i].valor_pago != 0){
+					    		if (obj[i].data_pagamento){
+					    			var from = obj[i].data_pagamento.split("/");
+					    			var dt = new Date(from[2], from[1] - 1, from[0]);
+					            	var d, m;
+					            	if (dt.getDate() <= 9) d = "0" + dt.getDate(); else d = dt.getDate();
+					            	if ((dt.getMonth()+1) <= 9) m = "0" + (dt.getMonth()+1); else m = dt.getMonth()+1;
+					            	trs +=  d + "/" + m + "/" + dt.getFullYear();
+								} 
+							}else trs += " -- ";
 						trs += "</center></td>" +
-						"<td class=\"col-md-1 valign\"><center>R$ " + obj[i].valor_pago + "</center></td>" +
+						"<td class=\"col-md-1 valign\"><center>R$ ";
+						obj[i].valor_pago = parseFloat(obj[i].valor_pago).toFixed(2);
+						trs += obj[i].valor_pago.replace(".", ",") +"</center></td>" +
 						"<td class=\"col-md-1 valign\"><center>";
 				    		if (obj[i].data_credito){
 				    			var from = obj[i].data_credito.split("/");

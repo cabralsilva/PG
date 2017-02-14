@@ -1,5 +1,6 @@
 <?php
 	require_once '../services/TransacaoService.php';
+	require_once '../services/StatusService.php';
 	
 	class ConsultasController{
 		
@@ -14,6 +15,18 @@
 			$_REQUEST["lstOperadoras"] = $retorno;
 		}
 		
+		public function buscarStatus(){
+			$ss = new StatusService();
+			$retorno = $ss->getStatusBoleto();
+			$_REQUEST["lstStatusBoleto"] = $retorno;
+			
+			$retorno = $ss->getStatusCartao();
+			$_REQUEST["lstStatusCartao"] = $retorno;
+			
+			$retorno = $ss->getStatusTodos();
+			$_REQUEST["lstStatusTodos"] = $retorno;
+		}
+		
 	}
 	
 	if(isset($_POST["servico"])){
@@ -21,8 +34,37 @@
 		elseif($_POST["servico"] == "buscarBoletosFiltro") buscarBoletosFiltro();
 		elseif($_POST["servico"] == "gerarRemessa") gerarRemessa();
 		elseif($_POST["servico"] == "gerarRemessaDia") gerarRemessaDia();
+		elseif($_POST["servico"] == "alterarStatus") alterarStatus();
 	}else{
 		//echo "SERVICO NÃO CATALOGADO";
+	}
+	
+	function alterarStatus(){
+		$ts = new TransacaoService();
+		$newStatus = $_POST["id_status"];
+		$idTransacao = $_POST["id_transacao"];
+		$idRemessa = $_POST["id_remessa"];
+		try {
+			
+			$ts->updateStatusTransaction($idTransacao, $newStatus, $idRemessa);
+			
+			$model = $ts->getDescricaoStatusTransaction($newStatus);
+			$model["id_transacao"] = $idTransacao;
+			$model["id_status"] = $newStatus;
+			echo json_encode( array (
+					'CodStatus' => 1,
+					'Msg' => 'Atualizado com sucesso',
+					'Model' => $model
+			));
+			
+		}catch (Exception $e){
+			
+			echo json_encode( array (
+					'CodStatus' => 2,
+					'Msg' => $e->getMessage (),
+					'Model' => null
+			));
+		}
 	}
 	
 	function buscarBoletosFiltro(){

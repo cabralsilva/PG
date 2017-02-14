@@ -1,0 +1,33 @@
+* {
+box-sizing: border-box;
+}
+
+body {
+font-family: Arial !important;
+background-color: #efefef !important;
+padding: 50px !important;
+}
+.box-central {
+margin: 20px auto;
+width: 300px;
+}
+.espaco-sistema{
+background-color: #FFF;
+padding: 20px;
+border-radius: 5px;
+}
+
+.espaco-sistema > a > img{
+	max-width: 260px;
+}
+
+.lst-sistemas{
+	background-color: white;
+}
+
+.descricao-sistema{
+	display: block;
+	text-align: center;
+    font-size: xx-large;
+    font-weight: bold;
+}

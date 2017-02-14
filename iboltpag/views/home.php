@@ -64,8 +64,10 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 										<thead>
 											<tr>
 												<th class="col-md-1"><center>ORIGEM</center></th>
-												<th class="col-md-1"><center>CODIGO</center></th>
+												<th class="col-md-1"><center>NOSSO NÚMERO</center></th>
+												<th class="col-md-1"><center>ENTRADA</center></th>
 												<th class="col-md-1"><center>VENCIMENTO</center></th>
+												<th class="col-md-1"><center>MOVIMENTAÇÃO</center></th>
 												<th class="col-md-1"><center>STATUS</center></th>
 												<th class="col-md-1"><center>FORMA PGTO.</center></th>
 												<th class="col-md-1 alignright">BRUTO</th>
@@ -82,90 +84,51 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 												<td class="col-md-1 valign">
 													<center>
 													<?php
-											switch ($pagamento ["id_origem"]) {
-												case "0" :
-													echo "Avulso";
-													break;
-												case "1" :
-													echo "Pedido";
-													break;
-												case "2" :
-													echo "Faturamento";
-													break;
-												case "3" :
-													echo "Tipo 3";
-													break;
-												case "4" :
-													echo "Tipo 4";
-													break;
-												case "5" :
-													echo "Tipo 5";
-													break;
-												case "6" :
-													echo "Tipo 6";
-													break;
-												case "7" :
-													echo "Tipo 7";
-													break;
-												case "8" :
-													echo "Tipo 8";
-													break;
-												case "9" :
-													echo "Tipo 9";
-													break;
-												default :
-													echo "Não identificada";
-													break;
-											}
-											?>
+														switch ($pagamento ["id_origem"]) {
+															case "0" :
+																echo "Avulso";
+																break;
+															case "1" :
+																echo "Pedido";
+																break;
+															case "2" :
+																echo "Faturamento";
+																break;
+															case "3" :
+																echo "Tipo 3";
+																break;
+															case "4" :
+																echo "Tipo 4";
+																break;
+															case "5" :
+																echo "Tipo 5";
+																break;
+															case "6" :
+																echo "Tipo 6";
+																break;
+															case "7" :
+																echo "Tipo 7";
+																break;
+															case "8" :
+																echo "Tipo 8";
+																break;
+															case "9" :
+																echo "Tipo 9";
+																break;
+															default :
+																echo "Não identificada";
+																break;
+														}
+														?>
 													</center>
 												</td>
-												<td class="col-md-1 valign"><center><?= $pagamento["fk_pedido"]?></center></td>
-												<td class="col-md-1 valign">
-													<center>
-														<?= date("d/m/Y", strtotime($pagamento["data_vencimento_boleto"]))?>
-													</center>
+												<td class="col-md-1 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
+												<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_criacao_origem"])) ?></center></td>
+												<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_vencimento_boleto"]))?></center>
+												<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_movimentacao"])) ?></center></td>
 												</td>
 												<td class="col-md-1 valign">
-													<center>
-													<?php
-											switch ($pagamento ["status_geral"]) {
-												case "0" :
-													echo "Pendente";
-													break;
-												case "1" :
-													echo "Autenticada";
-													break;
-												case "2" :
-													echo "Não Autenticada";
-													break;
-												case "3" :
-													echo "Autorizada";
-													break;
-												case "4" :
-													echo "Não Autorizada";
-													break;
-												case "5" :
-													echo "Capturada";
-													break;
-												case "6" :
-													echo "Cancelada";
-													break;
-												case "7" :
-													echo "Indefinida";
-													break;
-												case "8" :
-													echo "Pago";
-													break;
-												case "9" :
-													echo "Boleto contestado";
-													break;
-												default :
-													echo "Não identificada";
-													break;
-											}
-											?>
-													</center>
+													<center><?= $pagamento["estado"] ?></center>
 												</td>
 												<td class="col-md-1 valign">
 													<center>
@@ -193,24 +156,24 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 												</td>
 											</tr>
 											<tr class="success">
-												<td class="moredetailpayment" colspan="9">
+												<td class="moredetailpayment" colspan="11">
 													<div
 														id="moreinfopagamentopendentes-<?= $pagamento["id_transacao"]?>"
 														data-idpagamento="<?= $pagamento["id_transacao"]?>"
 														class="collapse moreinfopagamentopendentes">
 														<table id="table5" class="table table-hover sucess">
 															<thead class="headhistorico">
-																<tr class="success">
-																	<td class="col-md-4 "><center>NOSSO NÚMERO</center></td>
-																	<td class="col-md-4 "><center>CLIENTE</center></td>
-																	<td class="col-md-4 "><center>DATA CRIAÇÃO</center></td>
-																</tr>
+<!-- 																<tr class="success"> -->
+<!-- 																	<td class="col-md-4 "><center>NOSSO NÚMERO</center></td> -->
+<!-- 																	<td class="col-md-4 "><center>CLIENTE</center></td> -->
+<!-- 																	<td class="col-md-4 "><center>DATA CRIAÇÃO</center></td> -->
+<!-- 																</tr> -->
 															</thead>
 															<tbody>
 																<tr class="success">
-																	<td class="col-md-4 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
-																	<td class="col-md-4 valign"><center><?= $pagamento["nome_pagador"]?></center></td>
-																	<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_transacao"])) ?></center></td>
+<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
+<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
+<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
 																</tr>
 															</tbody>
 														</table>
@@ -248,8 +211,10 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 													<thead>
 														<tr>
 															<th class="col-md-1"><center>ORIGEM</center></th>
-															<th class="col-md-1"><center>CODIGO</center></th>
+															<th class="col-md-1"><center>NOSSO NÚMERO</center></th>
+															<th class="col-md-1"><center>ENTRADA</center></th>
 															<th class="col-md-1"><center>VENCIMENTO</center></th>
+															<th class="col-md-1"><center>MOVIMENTAÇÃO</center></th>
 															<th class="col-md-1"><center>STATUS</center></th>
 															<th class="col-md-1"><center>FORMA PGTO.</center></th>
 															<th class="col-md-1 alignright">BRUTO</th>
@@ -261,94 +226,56 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 													<tbody id="conteudo-relatorio">
 													<?php foreach($hc->getListPagamentosBoletosPendentes() as $pagamento){?>
 													
+														
 														<tr class='linha_relatorio'>
 															<td class="col-md-1 valign">
 																<center>
 																<?php
-														switch ($pagamento ["id_origem"]) {
-															case "0" :
-																echo "Avulso";
-																break;
-															case "1" :
-																echo "Pedido";
-																break;
-															case "2" :
-																echo "Faturamento";
-																break;
-															case "3" :
-																echo "Tipo 3";
-																break;
-															case "4" :
-																echo "Tipo 4";
-																break;
-															case "5" :
-																echo "Tipo 5";
-																break;
-															case "6" :
-																echo "Tipo 6";
-																break;
-															case "7" :
-																echo "Tipo 7";
-																break;
-															case "8" :
-																echo "Tipo 8";
-																break;
-															case "9" :
-																echo "Tipo 9";
-																break;
-															default :
-																echo "Não identificada";
-																break;
-														}
-														?>
+																	switch ($pagamento ["id_origem"]) {
+																		case "0" :
+																			echo "Avulso";
+																			break;
+																		case "1" :
+																			echo "Pedido";
+																			break;
+																		case "2" :
+																			echo "Faturamento";
+																			break;
+																		case "3" :
+																			echo "Tipo 3";
+																			break;
+																		case "4" :
+																			echo "Tipo 4";
+																			break;
+																		case "5" :
+																			echo "Tipo 5";
+																			break;
+																		case "6" :
+																			echo "Tipo 6";
+																			break;
+																		case "7" :
+																			echo "Tipo 7";
+																			break;
+																		case "8" :
+																			echo "Tipo 8";
+																			break;
+																		case "9" :
+																			echo "Tipo 9";
+																			break;
+																		default :
+																			echo "Não identificada";
+																			break;
+																	}
+																	?>
 																</center>
 															</td>
-															<td class="col-md-1 valign"><center><?= $pagamento["fk_pedido"]?></center></td>
-															<td class="col-md-1 valign">
-																<center>
-																	<?= date("d/m/Y", strtotime($pagamento["data_vencimento_boleto"]))?>
-																</center>
+															<td class="col-md-1 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
+															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_criacao_origem"])) ?></center></td>
+															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_vencimento_boleto"]))?></center>
+															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_movimentacao"])) ?></center></td>
 															</td>
 															<td class="col-md-1 valign">
-																<center>
-																<?php
-														switch ($pagamento ["status_geral"]) {
-															case "0" :
-																echo "Pendente";
-																break;
-															case "1" :
-																echo "Autenticada";
-																break;
-															case "2" :
-																echo "Não Autenticada";
-																break;
-															case "3" :
-																echo "Autorizada";
-																break;
-															case "4" :
-																echo "Não Autorizada";
-																break;
-															case "5" :
-																echo "Capturada";
-																break;
-															case "6" :
-																echo "Cancelada";
-																break;
-															case "7" :
-																echo "Indefinida";
-																break;
-															case "8" :
-																echo "Pago";
-																break;
-															case "9" :
-																echo "Boleto contestado";
-																break;
-															default :
-																echo "Não identificada";
-																break;
-														}
-														?>
-																</center>
+																<center><?= $pagamento["estado"] ?></center>
 															</td>
 															<td class="col-md-1 valign">
 																<center>
@@ -376,24 +303,24 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 															</td>
 														</tr>
 														<tr class="success">
-															<td class="moredetailpayment" colspan="10">
+															<td class="moredetailpayment" colspan="11">
 																<div
 																	id="moreinfopagamentoboletospendentes-<?= $pagamento["id_transacao"]?>"
 																	data-idpagamento="<?= $pagamento["id_transacao"]?>"
 																	class="collapse moreinfopagamentoboletospendentes">
 																	<table id="table5" class="table table-hover sucess">
 																		<thead class="headhistorico">
-																			<tr class="success">
-																				<td class="col-md-4 "><center>NOSSO NÚMERO</center></td>
-																				<td class="col-md-4 "><center>CLIENTE</center></td>
-																				<td class="col-md-4 "><center>DATA CRIAÇÃO</center></td>
-																			</tr>
+			<!-- 																<tr class="success"> -->
+			<!-- 																	<td class="col-md-4 "><center>NOSSO NÚMERO</center></td> -->
+			<!-- 																	<td class="col-md-4 "><center>CLIENTE</center></td> -->
+			<!-- 																	<td class="col-md-4 "><center>DATA CRIAÇÃO</center></td> -->
+			<!-- 																</tr> -->
 																		</thead>
 																		<tbody>
 																			<tr class="success">
-																				<td class="col-md-4 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
-																				<td class="col-md-4 valign"><center><?= $pagamento["nome_pagador"]?></center></td>
-																				<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_transacao"])) ?></center></td>
+			<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
+			<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
+			<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
 																			</tr>
 																		</tbody>
 																	</table>
@@ -415,8 +342,10 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 													<thead>
 														<tr>
 															<th class="col-md-1"><center>ORIGEM</center></th>
-															<th class="col-md-1"><center>CODIGO</center></th>
+															<th class="col-md-1"><center>NOSSO NÚMERO</center></th>
+															<th class="col-md-1"><center>ENTRADA</center></th>
 															<th class="col-md-1"><center>VENCIMENTO</center></th>
+															<th class="col-md-1"><center>MOVIMENTAÇÃO</center></th>
 															<th class="col-md-1"><center>STATUS</center></th>
 															<th class="col-md-1"><center>FORMA PGTO.</center></th>
 															<th class="col-md-1 alignright">BRUTO</th>
@@ -432,90 +361,51 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 															<td class="col-md-1 valign">
 																<center>
 																<?php
-														switch ($pagamento ["id_origem"]) {
-															case "0" :
-																echo "Avulso";
-																break;
-															case "1" :
-																echo "Pedido";
-																break;
-															case "2" :
-																echo "Faturamento";
-																break;
-															case "3" :
-																echo "Tipo 3";
-																break;
-															case "4" :
-																echo "Tipo 4";
-																break;
-															case "5" :
-																echo "Tipo 5";
-																break;
-															case "6" :
-																echo "Tipo 6";
-																break;
-															case "7" :
-																echo "Tipo 7";
-																break;
-															case "8" :
-																echo "Tipo 8";
-																break;
-															case "9" :
-																echo "Tipo 9";
-																break;
-															default :
-																echo "Não identificada";
-																break;
-														}
-														?>
+																	switch ($pagamento ["id_origem"]) {
+																		case "0" :
+																			echo "Avulso";
+																			break;
+																		case "1" :
+																			echo "Pedido";
+																			break;
+																		case "2" :
+																			echo "Faturamento";
+																			break;
+																		case "3" :
+																			echo "Tipo 3";
+																			break;
+																		case "4" :
+																			echo "Tipo 4";
+																			break;
+																		case "5" :
+																			echo "Tipo 5";
+																			break;
+																		case "6" :
+																			echo "Tipo 6";
+																			break;
+																		case "7" :
+																			echo "Tipo 7";
+																			break;
+																		case "8" :
+																			echo "Tipo 8";
+																			break;
+																		case "9" :
+																			echo "Tipo 9";
+																			break;
+																		default :
+																			echo "Não identificada";
+																			break;
+																	}
+																	?>
 																</center>
 															</td>
-															<td class="col-md-1 valign"><center><?= $pagamento["fk_pedido"]?></center></td>
-															<td class="col-md-1 valign">
-																<center>
-																	<?= date("d/m/Y", strtotime($pagamento["data_vencimento_boleto"]))?>
-																</center>
+															<td class="col-md-1 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
+															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_criacao_origem"])) ?></center></td>
+															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_vencimento_boleto"]))?></center>
+															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_movimentacao"])) ?></center></td>
 															</td>
 															<td class="col-md-1 valign">
-																<center>
-																<?php
-														switch ($pagamento ["status_geral"]) {
-															case "0" :
-																echo "Pendente";
-																break;
-															case "1" :
-																echo "Autenticada";
-																break;
-															case "2" :
-																echo "Não Autenticada";
-																break;
-															case "3" :
-																echo "Autorizada";
-																break;
-															case "4" :
-																echo "Não Autorizada";
-																break;
-															case "5" :
-																echo "Capturada";
-																break;
-															case "6" :
-																echo "Cancelada";
-																break;
-															case "7" :
-																echo "Indefinida";
-																break;
-															case "8" :
-																echo "Pago";
-																break;
-															case "9" :
-																echo "Boleto contestado";
-																break;
-															default :
-																echo "Não identificada";
-																break;
-														}
-														?>
-																</center>
+																<center><?= $pagamento["estado"] ?></center>
 															</td>
 															<td class="col-md-1 valign">
 																<center>
@@ -543,24 +433,24 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 															</td>
 														</tr>
 														<tr class="success">
-															<td class="moredetailpayment" colspan="10">
+															<td class="moredetailpayment" colspan="11">
 																<div
 																	id="moreinfopagamentoboletosremessapendentes-<?= $pagamento["id_transacao"]?>"
 																	data-idpagamento="<?= $pagamento["id_transacao"]?>"
 																	class="collapse moreinfopagamentoboletosremessapendentes">
 																	<table id="table5" class="table table-hover sucess">
 																		<thead class="headhistorico">
-																			<tr class="success">
-																				<td class="col-md-4 "><center>NOSSO NÚMERO</center></td>
-																				<td class="col-md-4 "><center>CLIENTE</center></td>
-																				<td class="col-md-4 "><center>DATA CRIAÇÃO</center></td>
-																			</tr>
+			<!-- 																<tr class="success"> -->
+			<!-- 																	<td class="col-md-4 "><center>NOSSO NÚMERO</center></td> -->
+			<!-- 																	<td class="col-md-4 "><center>CLIENTE</center></td> -->
+			<!-- 																	<td class="col-md-4 "><center>DATA CRIAÇÃO</center></td> -->
+			<!-- 																</tr> -->
 																		</thead>
 																		<tbody>
 																			<tr class="success">
-																				<td class="col-md-4 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
-																				<td class="col-md-4 valign"><center><?= $pagamento["nome_pagador"]?></center></td>
-																				<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_transacao"])) ?></center></td>
+			<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
+			<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
+			<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
 																			</tr>
 																		</tbody>
 																	</table>
@@ -582,8 +472,10 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 													<thead>
 														<tr>
 															<th class="col-md-1"><center>ORIGEM</center></th>
-															<th class="col-md-1"><center>CODIGO</center></th>
+															<th class="col-md-1"><center>NOSSO NÚMERO</center></th>
+															<th class="col-md-1"><center>ENTRADA</center></th>
 															<th class="col-md-1"><center>VENCIMENTO</center></th>
+															<th class="col-md-1"><center>MOVIMENTAÇÃO</center></th>
 															<th class="col-md-1"><center>STATUS</center></th>
 															<th class="col-md-1"><center>FORMA PGTO.</center></th>
 															<th class="col-md-1 alignright">BRUTO</th>
@@ -599,90 +491,51 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 															<td class="col-md-1 valign">
 																<center>
 																<?php
-														switch ($pagamento ["id_origem"]) {
-															case "0" :
-																echo "Avulso";
-																break;
-															case "1" :
-																echo "Pedido";
-																break;
-															case "2" :
-																echo "Faturamento";
-																break;
-															case "3" :
-																echo "Tipo 3";
-																break;
-															case "4" :
-																echo "Tipo 4";
-																break;
-															case "5" :
-																echo "Tipo 5";
-																break;
-															case "6" :
-																echo "Tipo 6";
-																break;
-															case "7" :
-																echo "Tipo 7";
-																break;
-															case "8" :
-																echo "Tipo 8";
-																break;
-															case "9" :
-																echo "Tipo 9";
-																break;
-															default :
-																echo "Não identificada";
-																break;
-														}
-														?>
+																	switch ($pagamento ["id_origem"]) {
+																		case "0" :
+																			echo "Avulso";
+																			break;
+																		case "1" :
+																			echo "Pedido";
+																			break;
+																		case "2" :
+																			echo "Faturamento";
+																			break;
+																		case "3" :
+																			echo "Tipo 3";
+																			break;
+																		case "4" :
+																			echo "Tipo 4";
+																			break;
+																		case "5" :
+																			echo "Tipo 5";
+																			break;
+																		case "6" :
+																			echo "Tipo 6";
+																			break;
+																		case "7" :
+																			echo "Tipo 7";
+																			break;
+																		case "8" :
+																			echo "Tipo 8";
+																			break;
+																		case "9" :
+																			echo "Tipo 9";
+																			break;
+																		default :
+																			echo "Não identificada";
+																			break;
+																	}
+																	?>
 																</center>
 															</td>
-															<td class="col-md-1 valign"><center><?= $pagamento["fk_pedido"]?></center></td>
-															<td class="col-md-1 valign">
-																<center>
-																	<?= date("d/m/Y", strtotime($pagamento["data_vencimento_boleto"]))?>
-																</center>
+															<td class="col-md-1 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
+															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_criacao_origem"])) ?></center></td>
+															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_vencimento_boleto"]))?></center>
+															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_movimentacao"])) ?></center></td>
 															</td>
 															<td class="col-md-1 valign">
-																<center>
-																<?php
-														switch ($pagamento ["status_geral"]) {
-															case "0" :
-																echo "Pendente";
-																break;
-															case "1" :
-																echo "Autenticada";
-																break;
-															case "2" :
-																echo "Não Autenticada";
-																break;
-															case "3" :
-																echo "Autorizada";
-																break;
-															case "4" :
-																echo "Não Autorizada";
-																break;
-															case "5" :
-																echo "Capturada";
-																break;
-															case "6" :
-																echo "Cancelada";
-																break;
-															case "7" :
-																echo "Indefinida";
-																break;
-															case "8" :
-																echo "Pago";
-																break;
-															case "9" :
-																echo "Boleto contestado";
-																break;
-															default :
-																echo "Não identificada";
-																break;
-														}
-														?>
-																</center>
+																<center><?= $pagamento["estado"] ?></center>
 															</td>
 															<td class="col-md-1 valign">
 																<center>
@@ -720,27 +573,27 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 															</td>
 														</tr>
 														<tr class="success">
-															<td class="moredetailpayment" colspan="10">
+															<td class="moredetailpayment" colspan="11">
 																<div
 																	id="moreinfopagamentoboletosretornopendentes-<?= $pagamento["id_transacao"]?>"
 																	data-idpagamento="<?= $pagamento["id_transacao"]?>"
 																	class="collapse moreinfopagamentoboletosretornopendentes">
 																	<table id="table5" class="table table-hover sucess">
-																		<thead class="headhistorico">
-																			<tr class="success">
-																				<td class="col-md-4 "><center>NOSSO NÚMERO</center></td>
-																				<td class="col-md-4 "><center>CLIENTE</center></td>
-																				<td class="col-md-4 "><center>DATA CRIAÇÃO</center></td>
-																			</tr>
-																		</thead>
-																		<tbody>
-																			<tr class="success">
-																				<td class="col-md-4 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
-																				<td class="col-md-4 valign"><center><?= $pagamento["nome_pagador"]?></center></td>
-																				<td class="col-md-4 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_transacao"])) ?></center></td>
-																			</tr>
-																		</tbody>
-																	</table>
+																	<thead class="headhistorico">
+		<!-- 																<tr class="success"> -->
+		<!-- 																	<td class="col-md-4 "><center>NOSSO NÚMERO</center></td> -->
+		<!-- 																	<td class="col-md-4 "><center>CLIENTE</center></td> -->
+		<!-- 																	<td class="col-md-4 "><center>DATA CRIAÇÃO</center></td> -->
+		<!-- 																</tr> -->
+																	</thead>
+																	<tbody>
+																		<tr class="success">
+		<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
+		<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
+		<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
+																		</tr>
+																	</tbody>
+																</table>
 																</div>
 															</td>
 														</tr>
@@ -761,8 +614,10 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 										<thead>
 											<tr>
 												<th class="col-md-1"><center>ORIGEM</center></th>
-												<th class="col-md-1"><center>CODIGO</center></th>
+												<th class="col-md-1"><center>NOSSO NÚMERO</center></th>
+												<th class="col-md-1"><center>ENTRADA</center></th>
 												<th class="col-md-1"><center>VENCIMENTO</center></th>
+												<th class="col-md-1"><center>MOVIMENTAÇÃO</center></th>
 												<th class="col-md-1"><center>STATUS</center></th>
 												<th class="col-md-1"><center>FORMA PGTO.</center></th>
 												<th class="col-md-1 alignright">BRUTO</th>
@@ -823,45 +678,7 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 													</center>
 												</td>
 												<td class="col-md-1 valign">
-													<center>
-													<?php
-											switch ($pagamento ["status_geral"]) {
-												case "0" :
-													echo "Pendente";
-													break;
-												case "1" :
-													echo "Autenticada";
-													break;
-												case "2" :
-													echo "Não Autenticada";
-													break;
-												case "3" :
-													echo "Autorizada";
-													break;
-												case "4" :
-													echo "Não Autorizada";
-													break;
-												case "5" :
-													echo "Capturada";
-													break;
-												case "6" :
-													echo "Cancelada";
-													break;
-												case "7" :
-													echo "Indefinida";
-													break;
-												case "8" :
-													echo "Pago";
-													break;
-												case "9" :
-													echo "Boleto contestado";
-													break;
-												default :
-													echo "Não identificada";
-													break;
-											}
-											?>
-													</center>
+													<center><?= $pagamento["estado"] ?></center>
 												</td>
 												<td class="col-md-1 valign">
 													<center>
@@ -929,242 +746,6 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 		</div>
 		<div id="table-loading"></div>
 		<br> Obs.: .
-		<p>
-		
-		<br>
-		
-		
-		<p>
-		
-		
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 3px solid;"></div>
-		<div class="linha-cb-branca" style="border-left: 1px solid;"></div>
-		<div class="linha-cb-preta" style="border-left: 1px solid;"></div>
-		</p>
 	</div>
 	
 	<?php include 'layout/modais.php';?>

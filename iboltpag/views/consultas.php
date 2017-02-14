@@ -4,6 +4,7 @@
 	$cc = new ConsultasController();
 	//$hc->buscarPagamentosPendentes();
 	$cc->buscarOperadorasBoleto();
+	$cc->buscarStatus();
 	date_default_timezone_set ( 'America/Sao_Paulo' );
 ?>
 <!DOCTYPE html>
@@ -97,13 +98,21 @@
 												<select class="form-control selectpicker" id="selecaoStatusConsulta"
 													multiple data-selected-text-format="count" title="Selecione..."
 													data-width="100%" multiple>
-													<option value="0">Pendentes</option>
-													<option value="1">Autenticada</option>
-													<option value="2">Não Autencada</option>
-													<option value="3">Autorizadas</option>
-													<option value="4">Não Autorizadas</option>
-													<option value="5">Capturadas</option>
-													<option value="6">Canceladas</option>
+													<optgroup label="Todos">
+													<?php foreach ($_REQUEST["lstStatusTodos"] as $statusTodos){?>
+														<option value="<?= $statusTodos["id_status"]?>"><?= $statusTodos["estado"]?></option>
+													<?php }?>
+													</optgroup>
+													<optgroup label="Boletos">
+													<?php foreach ($_REQUEST["lstStatusBoleto"] as $statusBoleto){?>
+														<option value="<?= $statusBoleto["id_status"]?>"><?= $statusBoleto["estado"]?></option>
+													<?php }?>
+													</optgroup>
+													<optgroup label="Cartao">
+													<?php foreach ($_REQUEST["lstStatusCartao"] as $statusCartao){?>
+														<option value="<?= $statusCartao["id_status"]?>"><?= $statusCartao["estado"]?></option>
+													<?php }?>
+													</optgroup>
 												</select> STATUS
 											</center></th>
 										<th class="col-md-1">
@@ -151,9 +160,40 @@
 	<?php include 'layout/modais.php';?>
 	
 	<script type="text/javascript">
+
+		var obj;
 		$(document).ready(function(){
 		    $('[data-toggle="tooltip"]').tooltip();   
 		});
+
+		function solicitarAlteracaoStatus(elem){
+
+			$.ajax({
+		    	url : "../controllers/consultasController.php",
+		        type: 'POST',
+		        data: {
+			        servico: "alterarStatus",
+			        id_transacao: elem.getAttribute('data-idt'),
+			        id_status: elem.getAttribute('data-st'),
+			        id_remessa: elem.getAttribute('data-rem')
+		        },
+		        success: function (data) {
+// 		            console.log(data);
+		            var obj2 = JSON.parse(data);
+// 					console.log(obj2);
+					for (i in obj){
+						if (obj[i].id_transacao == obj2["Model"]["id_transacao"]){
+							obj[i].fk_status = obj2["Model"]["id_status"];
+						 	obj[i].descricao_status = obj2["Model"]["descricao_status"];
+						}
+					}
+// 		            $("#status"+elem.getAttribute('data-idt')).html(obj["Model"]["descricao_status"]);
+		            $("#conteudo-relatorio").html(contruirRelatorio(obj));
+		        }
+		    });
+		    return false;
+		}
+				
 		
         function buscarBoletosFiltro() {
         	var operadoras = "";
@@ -163,7 +203,7 @@
 
         	var status = "";
         	$("#selecaoStatusConsulta option:selected").each(function(ind, elem) {
-        		status += elem.value + ",";
+        		status += elem.text + ",";
         	});
 
         	var origem = "";
@@ -204,7 +244,8 @@
 	        			valorTransacao : valorTransacao
 	        		},
 	        		success : function(e) {
-	        			var obj = JSON.parse(e);
+// 	        			console.log(e);
+	        			obj = JSON.parse(e);
 	        			if (obj.length == 0)
 	        				$("#conteudo-relatorio").html("<tr><td colspan='12' align='center'>Nenhum Registro encontrado!</td></tr>");
 	        			else
@@ -221,67 +262,95 @@
         }
 
         function contruirRelatorio(obj){
-        	
+//         	console.log(obj);
         	var trs = "";
         	for (i in obj){
         		trs += 	"<tr class='linha_relatorio'>" +
-        					"<td class=\"col-md-1\"><center>" +  ((obj[i].id_transacao != null)? obj[i].id_transacao : "") + "</center></td>" +
-        					"<td class=\"col-md-1\"><center>" +  ((obj[i].tipo_cobranca != null)? obj[i].tipo_cobranca : "") + "</center></td>" +
+        					"<td class=\"col-md-1\"><center>" +  obj[i].identificador + "</center></td>" +
+        					"<td class=\"col-md-1\"><center>";
+        						switch(obj[i].id_origem){
+        							case "0":
+            							trs += "Avulso";
+            							break;
+        							case "1":
+            							trs += "Pedido";
+            							break;
+        							case "2":
+            							trs += "Faturamento";
+            							break;
+            						default:
+            							trs += "Não identificado";
+            							break;
+        						}
+        					
+        					trs += "</center></td>" +
         					"<td class=\"col-md-1\"><center><a href=\"lista.php?pedido=" + obj[i].fk_pedido + "\">" + obj[i].fk_pedido + "</a></center></td>" +
         					"<td class=\"col-md-2\"><center>" + obj[i].nome_operadora + "</center></td>" +
         					
         					"<td class=\"col-md-2\"><center>";
-	        					if (obj[i].data_hora_pedido){
-        							var dt = new Date(obj[i].data_hora_pedido);
+	        					if (obj[i].data_criacao_origem){
+		        					var array = obj[i].data_criacao_origem.split("-");
+	        						var dt = new Date(array[1] + "-" + array[2] + "-" + array[0]);
         	                    	var d, m, mm;
+        	                    	
         	                    	if (dt.getDate() <= 9) d = "0" + dt.getDate(); else d = dt.getDate();
         	                    	if ((dt.getMonth()+1) <= 9) m = "0" + (dt.getMonth()+1); else m = dt.getMonth()+1;
         	                    	if (dt.getMinutes() <= 9) mm = "0" + dt.getMinutes(); else mm = dt.getMinutes();
-        	                    	trs +=  d + "/" + m + "/" + dt.getFullYear() + " " + dt.getHours() + ":" + mm;
+        	                    	trs +=  d + "/" + m + "/" + dt.getFullYear();
         						}
         					trs += "</center></td>" +
-        					"<td class=\"col-md-1\"><center>";
-        						switch (obj[i].status_geral) {
-                                    case "0":
-                                        trs += "Pendente"; 
-                                        break;
-                                    case "1":
-                                        trs += "Autenticada";
-                                        break;
-                                    case "2":
-                                        trs += "Não Autenticada";
-                                        break;
-                                    case "3":
-                                        trs += "Autorizada";
-                                        break;
-                                    case "4":
-                                        trs += "Não Autorizada";
-                                        break;
-                                    case "5":
-                                        trs += "Capturada";
-                                        break;
-                                    case "6":
-                                        trs += "Cancelada";
-                                        break;
-                                    case "7":
-                                        trs += "Indefinida";
-                                        break;
-                            	}
-        						
-        					trs += "</center></td>" +
+        					"<td class=\"col-md-1\"><center id=\"status" + obj[i].id_transacao + "\">" + obj[i].estado + "</center></td>" +
         					"<td class=\"col-md-1\"><center>" + obj[i].descricao_forma_pagamento + "</center></td> " +
 							"<td class=\"col-md-2\" align='right'>R$ ";
-        						if (obj[i].valor_transacao.indexOf(".") == -1) {
-        							var decimais = obj[i].valor_transacao.substr(-2, 2);
-        							obj[i].valor_transacao = obj[i].valor_transacao.substr(0, obj[i].valor_transacao.length-2);
-        							obj[i].valor_transacao = (parseFloat(obj[i].valor_transacao) + parseFloat(decimais)/100).toFixed(2);
-        						}
-        					obj[i].valor_transacao = parseFloat(obj[i].valor_transacao).toFixed(2);
-        					trs += obj[i].valor_transacao.replace(".", ",") +
+								
+//         						if (obj[i].valor_transacao.indexOf(".") == -1) {
+//         							var decimais = obj[i].valor_transacao.substr(-2, 2);
+//         							obj[i].valor_transacao = obj[i].valor_transacao.substr(0, obj[i].valor_transacao.length-2);
+//         							obj[i].valor_transacao = (parseFloat(obj[i].valor_transacao) + parseFloat(decimais)/100).toFixed(2);
+//         						}
+        						obj[i].valor_transacao = parseFloat(obj[i].valor_transacao).toFixed(2);
+        						trs += obj[i].valor_transacao.replace(".", ",") +
         					"</td>" +
         					"<td class=\"col-md-1\" align=\"right\">" +
-    							"<button type=\"button\" class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\" data-idt=\"" + obj[i].id_transacao + "\" onclick=\"imprimirBoleto(this)\">Boleto</button>" +
-        		    		"</td>" + 
+        						"<div class=\"btn-group\">" +
+								"<button type=\"button\"" +
+									"class=\"btn btn-success dropdown-toggle\"" +
+									"data-toggle=\"dropdown\" aria-haspopup=\"true\"" +
+									"aria-expanded=\"false\">" +
+									"Ações <span class=\"caret\"></span>" +
+								"</button>" +
+								"<ul class=\"dropdown-menu\">";
+// 								console.log(obj[i].fk_status);
+								switch (obj[i].fk_status){
+									case "1": //Solicitação de registro
+										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" data-st=\"4\" data-rem=\"" + obj[i].fk_remessa + "\" onclick=\"solicitarAlteracaoStatus(this)\" href=\"#\">Cancelar</a></li>";
+										trs += "<li role=\"separator\" class=\"divider\"></li>";
+										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" onclick=\"imprimirBoleto(this)\" href=\"#\">Boleto</a></li>";
+										break;
+									case "2": //Registrado
+										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" data-st=\"11\" data-rem=\"" + obj[i].fk_remessa + "\" onclick=\"solicitarAlteracaoStatus(this)\" href=\"#\">Cancelar</a></li>";
+										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" data-st=\"12\" data-rem=\"" + obj[i].fk_remessa + "\" onclick=\"solicitarAlteracaoStatus(this)\" href=\"#\">Protestar</a></li>"; 
+										trs += "<li role=\"separator\" class=\"divider\"></li>";
+										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" onclick=\"imprimirBoleto(this)\" href=\"#\">Boleto</a></li>";
+										break;
+									case "4":
+										trs += "<li class=\"dropdown-header\">Sem ações possíveis</li>";
+										break;
+									case "8": //Pendente
+										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" data-st=\"4\" data-rem=\"" + obj[i].fk_remessa + "\" onclick=\"solicitarAlteracaoStatus(this)\" href=\"#\">Cancelar</a></li>";
+										trs += "<li role=\"separator\" class=\"divider\"></li>";
+										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" onclick=\"imprimirBoleto(this)\" href=\"#\">Boleto</a></li>";
+										break;
+									default:
+										trs += "<li class=\"dropdown-header\">Sem ações possíveis</li>";
+										trs += "<li role=\"separator\" class=\"divider\"></li>";
+										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" onclick=\"imprimirBoleto(this)\" href=\"#\">Boleto</a></li>";
+										break;
+								}
+								
+								trs += "</ul>" +
+								"</div>" +
+							"</td>" + 
 						"</tr>";
         	}
         	

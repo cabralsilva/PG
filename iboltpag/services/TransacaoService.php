@@ -76,7 +76,9 @@ class TransacaoService {
 		return $lstBoletos;
 	}
 	private function updateSequencial($sequencial, $operadoraEmpresa) {
+// 		print_r( $sequencial);
 		$sql = "UPDATE operadora_empresa SET operadora_empresa.num_sequencial_remessa = " . ($sequencial + 1) . " WHERE operadora_empresa.id_operadora_empresa = " . $operadoraEmpresa;
+		
 		$result = $this->banco->getConexaoBanco ()->query ( $sql );
 	}
 	private function getSequencial($operadoraEmpresa) {
@@ -87,23 +89,40 @@ class TransacaoService {
 		$consulta->close ();
 		return $sequencial;
 	}
-	private function updateTransacaoRemessa($lstT, $dataArquivo, $nomeArquivo, $sequencial, $operadoraEmpresa, $idRemessa) {
+	private function updateTransacaoRemessa($lstT, $dataArquivo, $nomeArquivo, $sequencial, $operadoraEmpresa, $idRemessa, $dataReferencia) {
 		$dataFormatada = date ( 'Y-m-d', strtotime ( $dataArquivo ) );
+		if ($dataReferencia) $dataReferencia = date ("Y-m-d", strtotime($dataReferencia));
 		try {
 			if ($idRemessa == 0){
 				$sql = "INSERT INTO remessas (
-						data_arquivo, sequencial_remessa, nome_arquivo, fk_operadora_empresa
-					)VALUES (
-						DATE '" . $dataFormatada . "', " .
-										$sequencial . ", '" .
-										$nomeArquivo . "', " .
-										$operadoraEmpresa . "
-					)";
+							data_remessa, data_arquivo, sequencial_remessa, nome_arquivo, fk_operadora_empresa
+						)VALUES ( 
+							DATE '" . $dataReferencia . "', 
+							DATE '" . $dataFormatada . "', " .
+							$sequencial . ", '" .
+							$nomeArquivo . "', " .
+							$operadoraEmpresa . "
+						)";
 					if ($this->banco->getConexaoBanco ()->query ( $sql )) {
 						$id = $this->banco->getConexaoBanco ()->insert_id;
-					
+						
+// 						print_r($lstT);
 						foreach ( $lstT as $key => $value ) {
-							$sql = "UPDATE transacao SET " . "transacao.fk_remessa = " . $id . " WHERE transacao.id_transacao = " . $lstT [$key] ["id_transacao"];
+							
+							if ($lstT [$key] ["fk_status"] == 8){
+								$lstT [$key] ["novo_status"] = 1;
+							}elseif ($lstT [$key] ["fk_status"] == 11){
+								$lstT [$key] ["novo_status"] = 3;
+							}elseif ($lstT [$key] ["fk_status"] == 12){
+								$lstT [$key] ["novo_status"] = 5;
+							}
+							$sql = "INSERT INTO movimentacao (fk_transacao, fk_remessa, fk_status)
+									VALUES (".$lstT [$key] ["id_transacao"].", $id, " . $lstT [$key] ["novo_status"] . ")";
+							$result = $this->banco->getConexaoBanco ()->query ( $sql );
+							
+							
+							$sql = "UPDATE movimentacao SET 
+									movimentacao.fk_remessa = $id WHERE movimentacao.id_movimentacao = " . $lstT [$key] ["id_movimentacao"];
 							$result = $this->banco->getConexaoBanco ()->query ( $sql );
 						}
 					
@@ -125,12 +144,34 @@ class TransacaoService {
 						);
 					}
 			}else{
-				$sql = "UPDATE remessas set remessas.sequencial_remessa = $sequencial WHERE remessas.id_remessa = $idRemessa";
-				if ($this->banco->getConexaoBanco ()->query ( $sql )) {
-					foreach ( $lstT as $key => $value ) {
-						$sql = "UPDATE transacao SET " . "transacao.fk_remessa = " . $idRemessa . " WHERE transacao.id_transacao = " . $lstT [$key] ["id_transacao"];
-						$result = $this->banco->getConexaoBanco ()->query ( $sql );
-					}
+				$sql = "UPDATE remessas set remessas.data_arquivo = '" . $dataFormatada . "' WHERE remessas.id_remessa = $idRemessa";
+				$this->banco->getConexaoBanco ()->query ( $sql );
+// 				if ($this->banco->getConexaoBanco ()->query ( $sql )) {
+// 					print_r($lstT);
+// 					foreach ( $lstT as $key => $value ) {
+
+// 						if ($lstT [$key] ["fk_status"] == 8){
+// 							$lstT [$key] ["novo_status"] = 1;
+// 						}elseif ($lstT [$key] ["fk_status"] == 11){
+// 							$lstT [$key] ["novo_status"] = 3;
+// 						}elseif ($lstT [$key] ["fk_status"] == 12){
+// 							$lstT [$key] ["novo_status"] = 5;
+// 						}
+						
+// 						print_r($lstT[$key]);
+// 						$sql = "UPDATE movimentacao SET
+// 							movimentacao.fk_remessa = $idRemessa WHERE movimentacao.id_movimentacao = " . $lstT [$key] ["id_movimentacao"];
+// 						$result = $this->banco->getConexaoBanco ()->query ( $sql );
+						
+// 						$sql = "INSERT INTO movimentacao (fk_transacao, fk_remessa, fk_status)
+// 									VALUES (".$lstT [$key] ["id_transacao"].", $id, " . $lstT [$key] ["novo_status"] . ")";
+// 						$result = $this->banco->getConexaoBanco ()->query ( $sql );
+													
+// 						$sql = "UPDATE transacao SET 
+// 									transacao.fk_remessa = $idRemessa 
+// 									,movimentacao.fk_status = " . $lstT [$key] ["novo_status"] . " WHERE transacao.id_transacao = " . $lstT [$key] ["id_transacao"];
+// 						$result = $this->banco->getConexaoBanco ()->query ( $sql );
+// 					}
 						
 // 					$dataFormatada = date ( 'Y-m-d', strtotime ( $dataArquivo ) );
 // 					foreach ( $lstT as $key => $value ) {
@@ -144,7 +185,7 @@ class TransacaoService {
 					);
 				}
 				
-			}
+// 			}
 			
 		
 					
@@ -189,17 +230,24 @@ class TransacaoService {
 	}
 	
 	//ESTA FUNÇÃO BUSCA AS TRANSAÇÕES PARA GERAÇÃO DO ARQUIVO REMESSA
-	public function getTransacoesBoletosFiltro($codEmpresa, $dataI, $dataF, $operadoras, $status, $codPedido, $valor, $codTransacao) {
+	public function getTransacoesBoletosFiltro($codEmpresa, $dataI, $dataF, $operadoras, $status, $codPedido, $valor, $codTransacao, $remessa) {
 		$previous = false;
 		
 		$sql = "SELECT  transacao.*, operadoras.nome_operadora, operadoras.codigo_banco, 
-						forma_pagamento.*, operadora_empresa.*, empresa.NOME, empresa.CNPJ  
+						forma_pagamento.*, operadora_empresa.*, empresa.NOME, empresa.CNPJ, movimentacao.*, remessas.*   
 							FROM TRANSACAO 
 						LEFT OUTER JOIN forma_pagamento_operadora_empresa ON transacao.fk_forma_pagamento_operadora_empresa = forma_pagamento_operadora_empresa.id_forma_pagamento_operadora_empresa
 						INNER JOIN operadora_empresa ON forma_pagamento_operadora_empresa.fk_operadora_empresa = operadora_empresa.id_operadora_empresa
 						INNER JOIN operadoras ON operadora_empresa.fk_operadora = operadoras.id_operadora 
 						INNER JOIN empresa ON operadora_empresa.fk_empresa = empresa.CODIGO
-						INNER JOIN forma_pagamento ON forma_pagamento_operadora_empresa.fk_forma_pagamento = forma_pagamento.id_forma_pagamento ";
+						INNER JOIN forma_pagamento ON forma_pagamento_operadora_empresa.fk_forma_pagamento = forma_pagamento.id_forma_pagamento 
+						
+						INNER JOIN movimentacao ON movimentacao.fk_transacao = transacao.id_transacao 
+						LEFT JOIN remessas ON movimentacao.fk_remessa = remessas.id_remessa ";
+// 							AND movimentacao.id_movimentacao = ( 
+// 							SELECT movimentacao.id_movimentacao FROM movimentacao
+// 								WHERE movimentacao.fk_transacao = transacao.id_transacao ORDER BY movimentacao.id_movimentacao DESC LIMIT 1 
+// 							)  ";
 		
 		
 		if ($operadoras [0] !== "") {
@@ -215,35 +263,24 @@ class TransacaoService {
 			$sql .= $whereoperadoras;
 		}
 		
-		if ($status !== "") {
-			if ($status [0] !== "") {
-				
+		if (!$remessa){
+			if (isset ( $dataI )) {
 				if ($previous)
-					$sql .= " and ";
+					$sql .= " AND ";
 				else
 					$sql .= " WHERE ";
 				$previous = true;
-				$wherestatus = "(";
-				for($i = 0; $i < count ( $status ); $i ++) {
-					if ($i == (count ( $status ) - 1))
-						$wherestatus .= "transacao.status_geral = " . $status [$i] . "";
-					else
-						$wherestatus .= "transacao.status_geral = " . $status [$i] . " or ";
-				}
-				$wherestatus .= ")";
-				$sql .= $wherestatus;
-				// echo $sql;
+				$wheredataPeriodo = "(movimentacao.data_remessa = '" . $dataI . "' AND '" . $dataF . "')";
+				$sql .= $wheredataPeriodo;
 			}
-		}
-		
-		if (isset ( $dataI )) {
+		}else{
 			if ($previous)
-				$sql .= " and ";
+				$sql .= " AND ";
 			else
 				$sql .= " WHERE ";
-			$previous = true;
-			$wheredataPeriodo = "(transacao.data_hora_transacao BETWEEN '" . $dataI . "' AND '" . $dataF . "')";
-			$sql .= $wheredataPeriodo;
+				$previous = true;
+				$wheredataPeriodo = "(movimentacao.fk_remessa = " . $remessa["id_remessa"] . ")";
+				$sql .= $wheredataPeriodo;
 		}
 		
 		if ($codPedido != "" && $codPedido != 0) {
@@ -275,18 +312,41 @@ class TransacaoService {
 			else
 				$sql .= " WHERE ";
 			$previous = true;
-			$whereValor = "(transacao.identificador_boleto = '" . $codTransacao . "')";
+			$whereValor = "(transacao.identificador = '" . $codTransacao . "')";
 			$sql .= $whereValor;
 		}
 		
-		$sql .= " AND (transacao.status_geral <> 99)";
-		// echo $sql;
+		if ($remessa == null)
+			$sql .= " AND (movimentacao.fk_status IN (8, 11, 12))";
+		else 
+			$sql .= " AND (movimentacao.fk_status IN (4, 8, 11, 12))";
+// 		echo "$sql -- ";
 		return $this->buscaTransacoesPersonalizada ( $sql, $_SESSION ["dados_acesso"] [0] ["CODIGO"] );
 	}
 	public function gerarBoleto($codTransacao) {
 	}
+	
+	private function verificarSeJaExisteRemessa($dataI, $dataF, $banco, $empresa ){
+		$sql = "SELECT remessas.* FROM remessas
+					INNER JOIN operadora_empresa ON remessas.fk_operadora_empresa = operadora_empresa.id_operadora_empresa
+					INNER JOIN empresa ON operadora_empresa.fk_empresa = empresa.CODIGO
+					WHERE (remessas.data_remessa BETWEEN '$dataI' AND '$dataF') AND empresa.CODIGO = $empresa";
+// 		echo  "--- $sql ---";
+		$consulta = $this->banco->getConexaoBanco ()->query ( $sql );
+		$lstRemessas = array ();
+		while ( $linha = $consulta->fetch_array ( MYSQLI_ASSOC ) ) {
+			array_push ( $lstRemessas, $linha );
+		}
+		$consulta->close ();
+		
+		if (count($lstRemessas) == 1) return $lstRemessas[0];
+		else return false;
+	}
+	
 	public function gerarRemessaBradescos400Dia($dataI, $dataF, $banco, $empresa) {
-		$lstTransacoes = $this->getTransacoesBoletosFiltro ( $empresa, $dataI, $dataF, $banco, "", "", "", "" );
+		
+		
+		$lstTransacoes = $this->getTransacoesBoletosFiltro ( $empresa, $dataI, $dataF, $banco, "", "", "", "");
 		// print_r($lstTransacoes);
 		foreach ( $lstTransacoes as $chave => $value ) {
 			if ($lstTransacoes [$chave] ["sequencial_remessa"] == "" || $lstTransacoes [$chave] ["sequencial_remessa"] == null) {
@@ -602,22 +662,85 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 	}
 	
 	public function gerarRemessaBancodoBrasil400Dia($dataI, $dataF, $banco, $empresa) {
-		$lstTransacoes = $this->getTransacoesBoletosFiltro ( $empresa, $dataI, $dataF, $banco, "", "", "", "" );
-		// print_r($lstTransacoes);
+		$remessa = $this->verificarSeJaExisteRemessa($dataI, $dataF, $banco, $empresa);
+		$lstTransacoes = $this->getTransacoesBoletosFiltro ( $empresa, $dataI, $dataF, $banco, "", "", "", "", $remessa);
+		
 		$retorno = array ();
-		if (count ( $lstTransacoes ) > 0) {
+		if ($remessa != null){
+			
+			$lstTransacoesCanceladas = array();
+			
+			//CRIAR ARRAY COM CANCELADOS
 			foreach ( $lstTransacoes as $chave => $value ) {
-				if (!$lstTransacoes [$chave] ["fk_remessa"]){
-					$sequencial = $this->getSequencial ( $lstTransacoes [0] ["id_operadora_empresa"] );
-					$lstTransacoes [$chave] ["num_sequencial_remessa"] = $sequencial ["num_sequencial_remessa"];
-				}else{
-					$this->remontarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa , $lstTransacoes[$chave]["fk_remessa"]);
-					array_push ( $retorno, 3 );
-					array_push ( $retorno, $lstTransacoes [0] ["nome_arquivo"] );
-					array_push ( $retorno, $empresa );
-					return $retorno;
-					break;
+				if ($lstTransacoes[$chave]["fk_status"] == 4){
+					array_push($lstTransacoesCanceladas, $lstTransacoes[$chave]);
 				}
+			}
+			
+			//REMOVER DO ARRAY PRINCIPAL OS CANCELADOS
+			foreach ($lstTransacoesCanceladas as $chave => $valor){
+				foreach ($lstTransacoes as $key => $value){
+					if ($lstTransacoes[$key]["id_transacao"] == $lstTransacoesCanceladas[$chave]["id_transacao"]){
+						unset($lstTransacoes[$key]);
+					}
+				}
+			}
+			$lstTransacoes = array_values($lstTransacoes);
+			
+// 			print_r($lstTransacoes);
+			if (count ( $lstTransacoes ) > 0) {
+				//REMONTA REMESSA
+				$this->remontarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa , $remessa);
+				array_push ( $retorno, 3 );
+				array_push ( $retorno, $remessa ["nome_arquivo"] );
+				array_push ( $retorno, $empresa );
+				return $retorno;
+				break;
+			}else return null;
+			
+		}else{
+			if (count ( $lstTransacoes ) > 0) {
+				
+				foreach ( $lstTransacoes as $chave => $value ) {
+					$sql = "SELECT movimentacao.* FROM movimentacao
+								WHERE movimentacao.fk_transacao = " . $lstTransacoes[$chave]["id_transacao"] . " AND movimentacao.fk_status = 4";
+					
+					$consulta = $this->banco->getConexaoBanco ()->query ( $sql );
+					if ($consulta->num_rows){
+						unset($lstTransacoes[$chave]);	
+					}
+				}
+				$lstTransacoes = array_values($lstTransacoes);
+				
+				$sequencial = $this->getSequencial ( $lstTransacoes [0] ["id_operadora_empresa"] )["num_sequencial_remessa"];
+				
+// 				$lstTransacoes [$chave] ["num_sequencial_remessa"] = $sequencial ["num_sequencial_remessa"];
+					
+				$nomeArquivo = $this->gerarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa, $sequencial, $dataI );
+				array_push ( $retorno, 1 );
+				array_push ( $retorno, $nomeArquivo );
+				array_push ( $retorno, $empresa );
+				return $retorno;
+				break;
+			}else return null;
+		}
+		
+		
+		// print_r($lstTransacoes);
+// 		$retorno = array ();
+// 		if (count ( $lstTransacoes ) > 0) {
+// 			foreach ( $lstTransacoes as $chave => $value ) {
+// 				if (!$lstTransacoes [$chave] ["fk_remessa"]){
+// 					$sequencial = $this->getSequencial ( $lstTransacoes [0] ["id_operadora_empresa"] );
+// 					$lstTransacoes [$chave] ["num_sequencial_remessa"] = $sequencial ["num_sequencial_remessa"];
+// 				}else{
+// 					$this->remontarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa , $lstTransacoes[$chave]["fk_remessa"]);
+// 					array_push ( $retorno, 3 );
+// 					array_push ( $retorno, $lstTransacoes [0] ["nome_arquivo"] );
+// 					array_push ( $retorno, $empresa );
+// 					return $retorno;
+// 					break;
+// 				}
 				
 // 				if ($lstTransacoes [$chave] ["sequencial_remessa"] == "" || $lstTransacoes [$chave] ["sequencial_remessa"] == null) {
 // 					$sequencial = $this->getSequencial ( $lstTransacoes [0] ["id_operadora_empresa"] );
@@ -632,17 +755,17 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 // 				}
 				
 				
-			}
-			$nomeArquivo = $this->gerarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa );
-			array_push ( $retorno, 1 );
-			array_push ( $retorno, $nomeArquivo );
-			array_push ( $retorno, $empresa );
-			return $retorno;
-		} else
-			return null;
+// 			}
+// 			$nomeArquivo = $this->gerarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa );
+// 			array_push ( $retorno, 1 );
+// 			array_push ( $retorno, $nomeArquivo );
+// 			array_push ( $retorno, $empresa );
+// 			return $retorno;
+// 		} else
+// 			return null;
 	}
 	
-	public function montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual, $empresa ){
+	public function montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual, $empresa, $sequencialR ){
 		//ELIMINA OS ARQUIVO SALVOS NA APLICAÇÃO QUE FORAM CRIADOS A MAIS DE UM MINUTO		
 		foreach (glob($empresa."/*.REM") as $file) {
 			$modificado = new DateTime(date("Y-m-d\TH:i:s", filemtime($file)));
@@ -678,7 +801,6 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		$valor_iof = $this->zerosEsquerda ( 0, 13 );
 		$valor_abatimento = $this->zerosEsquerda ( 0, 13 );
 		
-		
 		$reg0 = "0" . // IDENTIFICAÇÃO DO REGISTRO - TAMANHO 1 / 001-001 DEFAULT '0'
 			"1" . // IDENTIFICAÇÃO DO ARQUIVO REMESSA - TAMANHO 1 / 002-002 DEFAULT '1'
 			$this->brancosDireita ( "REMESSA", 7 ) . // LITERAL REMESSA - TAMANHO 7 - 003-009 ALFA DEFAULT 'REMESSA' - PARA ARQUIVOS DE TESTE ENVIAR 'TESTE' NESTE CAMPO
@@ -693,7 +815,7 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 			$this->brancosDireita ( $this->replaceCharAscensionToUpper($lstTransacoes [0] ["NOME"]), 30 ) . // NOME EMPRESA - TAMANHO 30 / 047-076 ALFA
 			$this->brancosDireita ( "001BANCO DO BRASIL", 18 ) . // 001BANCODOBRASIL - TAMANHO 18 / 077-094 ALFA
 			$dataAtual . // DATA GRAVAÇÃO DO ARQUIBO - TAMANHO 6 / 095-100 NUM
-			$this->zerosEsquerda ( $lstTransacoes [0] ["num_sequencial_remessa"], 7 ) . // NÚMERO SEQUENCIAL REMESSA - TAMANHO 7 / 101-107 NUM
+			$this->zerosEsquerda ( $sequencialR, 7 ) . // NÚMERO SEQUENCIAL REMESSA - TAMANHO 7 / 101-107 NUM
 			$this->gerarEspacosBrancos ( 22 ) . // USO FEBRABAN - TAMANHO 22 / 108-129
 			$this->zerosEsquerda ( $lstTransacoes [0] ["num_convenio_lider_banco_brasil"], 7 ) . // Número do Convênio Líder - TAMANHO 7 / 130-136 ALFA
 			$this->gerarEspacosBrancos ( 258 ) . // USO FEBRABAN - TAMANHO 277 / 137-394
@@ -703,139 +825,156 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		$_i = 1;
 		$_seq = 1;
 		for($_i; $_i <= count ( $lstTransacoes ); $_i ++) {
-			$nosso_numero = $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["fk_pedido"], 11 );
-			// $data = strtotime($transacao["DataRetornoCaptura"]);
-			// echo date("d/m/Y G:i", $data);
-			$dataTitulo = new DateTime ( $lstTransacoes [($_i - 1)] ["data_hora_transacao"] );
-			$data_vencimento = new DateTime ( $lstTransacoes [($_i - 1)] ["data_vencimento_boleto"] );
-			// $data_vencimento->add(new DateInterval('P5D'));
-			$valor = $lstTransacoes [($_i - 1)] ["valor_transacao"];
-			$valor = number_format($valor, 2, '.', ',');
-			$valor = $this->removePontosVirgulas ( $valor, 13 );
+				$nosso_numero = $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["fk_pedido"], 11 );
+				// $data = strtotime($transacao["DataRetornoCaptura"]);
+				// echo date("d/m/Y G:i", $data);
+				$dataTitulo = new DateTime ( $lstTransacoes [($_i - 1)] ["data_criacao_origem"] );
+				$data_vencimento = new DateTime ( $lstTransacoes [($_i - 1)] ["data_vencimento_boleto"] );
+				// $data_vencimento->add(new DateInterval('P5D'));
+				$valor = $lstTransacoes [($_i - 1)] ["valor_transacao"];
+				$valor = number_format($valor, 2, '.', ',');
+				$valor = $this->removePontosVirgulas ( $valor, 13 );
 				
-			$dias_desconto = 0;
-			$data_limite_desconto = clone $data_vencimento;
-			$data_limite_desconto->sub ( new DateInterval ( 'P' . $dias_desconto . 'D' ) );
-			$valor_desconto_boleto = $this->removePontosVirgulas ( number_format ( $lstTransacoes [($_i - 1)] ["valor_desconto"], 2 ), 13 );
-			$tipo_inscricao_pagador = $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["tipo_inscricao_pagador"], 2 );
-			$cpf_cnpj_pagador = $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["inscricao_pagador"], 14 );
-			$tipo_inscricao_beneficiario = "02";
-			$cpf_cnpj_beneficiario = $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["CNPJ"], 14 );
-			$cep_pagador = explode ( "-", $lstTransacoes [($_i - 1)] ["cep_pagador"] );
-			$prefixo_cep_pagador = str_replace ( ".", "", $cep_pagador [0] );
-			$prefixo_cep_pagador = $this->zerosEsquerda ( $prefixo_cep_pagador, 5 );
-			$sufixo_cep_pagador = $this->zerosEsquerda ( $cep_pagador [1], 3 );
-			$variacaoCarteira = str_replace ( "-", "", $lstTransacoes [($_i - 1)] ["codigo_variacao_carteira_banco_brasil"] );
-				
-			$regTransacao .=
-				/*IDENTIFICAÇÃO EMPRESA BENEFICIÁRIA - TAMANHO 17 / 021-037 ALFA*/
-				"7" . // IDENTIFICAÇÃO DO REGISTRO - TAMANHO 1 / 001-001 NUM DEFAULT '7'
-				$tipo_inscricao_beneficiario . // IDENTIFICAÇÃO TIPO INSCRIÇÃO DO BENEFICIARIO - TAMANHO 2 / 002-003 NUM
-				$cpf_cnpj_beneficiario . // NÚMERO INSCRIÇÃO DO BENEFICIARIO - TAMANHO 14 / 004-017 NUM
-				$this->zerosEsquerda ( $agencia, 4 ) . // agencia s/ digito - TAMANHO 4 / 018-021 ALFA
-				$this->zerosEsquerda ( $dg_agencia, 1 ) . // digito agencia - TAMANHO 1 / 022-022 ALFA
-				$this->zerosEsquerda ( $conta, 8 ) . // conta corrente - TAMANHO 8 / 023-030 ALFA
-				$this->zerosEsquerda ( $dg_conta, 1 ) . // conta corrente - TAMANHO 1 / 031-031 ALFA
-				$this->zerosEsquerda ( $lstTransacoes [0] ["num_convenio_banco_brasil"], 7 ) . // Número do Convênio - TAMANHO 7 / 032-038 ALFA
-				// $this->gerarEspacosZeros ( 19 )
-				/* FIM IDENTIFICAÇÃO EMPRESA BENEFICIÁRIA - TAMANHO 17 / 021-037 ALFA */
-	
-				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["id_transacao"], 25 ) . // CÓDIGO DE CONTROLE DA EMPRESA - TAMANHO 25 / 039-063 ALFA (será o código da tabela transação)
-				 
-				// NOSSO NÚMERO
-				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["num_convenio_banco_brasil"], 7 ) . // Número convênio - TAMANHO 7 / 064-070
-				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["id_origem"] , 1 ) .
-				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["fk_pedido_pagamento"], 9 ) . // IDENTIFICAÇÃO DO TÍTULO NO BANCO - TAMANHO 9 / 071-080 NUM (NOSSO NÚMERO)
-				// FIM NOSSO NÚMERO
-				
-				$this->gerarEspacosZeros ( 2 ) . // número da prestação - TAMANHO 2 / 081-082 NUM
-				$this->gerarEspacosZeros ( 2 ) . // grupo de valor - TAMANHO 2 / 083-084 NUM
-				$this->gerarEspacosBrancos ( 3 ) . // USO FEBRABAN - TAMANHO 3 / 085-087 BRANCOS
-				$this->gerarEspacosBrancos ( 1 ) . // Indicativo de Mensagem ou Sacador/Avalista - TAMANHO 1 / 088-088 branco ( Poderá ser informada nas posições 352 a 391 qualquer mensagem para ser impressa no boleto.)
-				$this->gerarEspacosBrancos ( 3 ) . // Indicativo de Mensagem ou Sacador/Avalista - TAMANHO 3 / 089-091 branco
-				$this->zerosEsquerda ( $variacaoCarteira, 3 ) . // Variação da carteira - tamanho 3 / 092-094
-				$this->gerarEspacosZeros ( 1 ) . // conta caução - tamanho 1 / 095-095 "0"
-				$this->gerarEspacosZeros ( 6 ); // número borderô - tamanho 6 / 096-101
-				if ($lstTransacoes[($_i - 1)]["tipo_cobranca_banco_brasil"] != null)
-					$regTransacao .= $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["tipo_cobranca_banco_brasil"], 5 );
-				else
-					$regTransacao .= $this->gerarEspacosBrancos(5);
-// 				($lstTransacoes[($_i - 1)]["tipo_cobranca_banco_brasil"] == null)?($this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["tipo_cobranca_banco_brasil"], 5 )):$this->gerarEspacosBrancos(5) . // Tipo de Cobrança - tamanho 5 / 102-106
-				$regTransacao .= $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["codigo_carteira"], 2 ) ; // Carteira - tamanho 2 / 107-108
-				switch ($lstTransacoes[($_i - 1)] ["status_geral"]){
-					case 16:
-						$regTransacao .= "02";
-						break;
-					default:
-						$regTransacao .= "01";
-						break;
-				}
-// 				"01" . // COMANDO VIDE MANUAL - tamanho 2 / 109-110
-				$regTransacao .= $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["id_origem"] , 1 ) .
-				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["fk_pedido"], 9 ) . // Seu Número/Número do Título Atribuído pelo Cedente - TAMANHO 10 / 111-120 NUM
-				$data_vencimento->format ( 'dmy' ) . // DATA VENCIMENTO TITULO - TAMANHO 6 / 121-126 NUM
-	
-				$valor . // VALOR DO TÍTULO - TAMANHO 13 / 127-139 NUM
-				$this->zerosEsquerda ( $lstTransacoes [0] ["codigo_banco"], 3 ) . // CÓDIGO DO BANCO NA COMPENSAÇÃO - TAMANHO 3 / 140-142 NUM
-	
-				$this->gerarEspacosZeros ( 4 ) . // prefixo agencia cobradora - TAMANHO 4 / 143-146 NUM
-				$this->gerarEspacosBrancos ( 1 ) . // digito agencia cobradora - TAMANHO 1 / 147-147
-				$especie_titulo . // ESPECIE titulo - tamanho 2 / 148-149
-				$this->brancosDireita ( $lstTransacoes [($_i - 1)] ["aceite_boleto"], 1 ) . // aceito do título - tamanho 1 / 150-150
-				$dataTitulo->format ( 'dmy' ) . // data do titulo - tamanho 6 / 151-156
-	
-				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["primeira_instrucao_codificada"], 2 ) . // tamanho 2 / 157-158
-				$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["segunda_instrucao_codificada"], 2 ) . // tamanho 2 / 159-160
-				$valor_mora . // VALOR ACRESC POR DIA DE ATRASO - TAMANHO 13 / 161-173 NUM
-				$this->gerarEspacosZeros ( 6 ) .
-// 				$data_limite_desconto->format ( 'dmy' ) . // DATA LIMITE PARA CONCESSÃO DESCONTO - TAMANHO 6 / 174-179 NUM
-				$valor_desconto_boleto . // VALOR DESCONTO - TAMANHO 13 / 180-192 NUM
-				$valor_iof . // VALOR IOF - TAMANHO 13 / 192-205 NUM
-				$valor_abatimento . // VALOR ABATIMENTO A SER CONCEDIDO/CANCELADO - TAMANHO 13 / 206-218 NUM
-	
-				$tipo_inscricao_pagador . // tamanho 2 / 219-220
-				$cpf_cnpj_pagador . // tamanho 14 / 221-234
-	
-				$this->brancosDireita ( $this->replaceCharAscensionToUpper($lstTransacoes [($_i - 1)] ["nome_pagador"]), 37 ) . // NOME PAGADOR - TAMANHO 37 / 235-271 ALFA
-				$this->gerarEspacosBrancos ( 3 ) . // tamanho 6 / 272-274
-				$this->brancosDireita($this->replaceCharAscensionToUpper($lstTransacoes [($_i - 1)] ["logradouro_pagador"]). " " . $lstTransacoes [($_i - 1)] ["numero_end_pagador"]. " " . $this->replaceCharAscensionToUpper($lstTransacoes [($_i - 1)] ["complemento_end_pagador"]), 40) .
-// 				$this->gerarEspacosBrancos ( 40 ) . // ENDEREÇO COMPLETO - TAMANHO 40 / 275-314 ALFA
-				$this->brancosDireita($this->replaceCharAscensionToUpper($lstTransacoes [($_i - 1)] ["bairro_pagador"]), 12) .
-// 				$this->gerarEspacosBrancos ( 12 ) . // Bairro pagador - TAMANHO 12 / 315-326 ALFA
-				$prefixo_cep_pagador . // CEP PAGADOR - TAMANHO 5 / 327-331 NUM
-				$sufixo_cep_pagador . // SUFIXO CEP - TAMANHO 3 / 332-334 NUM
-				$this->brancosDireita($this->replaceCharAscensionToUpper($lstTransacoes [($_i - 1)] ["cidade_pagador"]), 15) .
-// 				$this->gerarEspacosBrancos ( 15 ) . // CIDADE PAGADOR - TAMANHO 15 / 335-349 ALFA
-				$this->brancosDireita($this->replaceCharAscensionToUpper($lstTransacoes [($_i - 1)] ["uf_pagador"]), 2) .
-// 				$this->gerarEspacosBrancos ( 2 ) . // uf PAGADOR - TAMANHO 2 / 350-351 ALFA
-				$this->gerarEspacosBrancos ( 40 ) . // MENSAGEM AO PAGADOR - TAMANHO 2 / 352-391 ALFA
-				$this->gerarEspacosBrancos ( 2 ) . // NÚMERO DE DIAS PARA PROTESTO CASO “Comando” = 01 E “instrução codificada” = 06 - TAMANHO 2 / 392-393 ALFA
-				$this->gerarEspacosBrancos ( 1 ) . // BRANCOS - TAMANHO 2 / 350-351 ALFA
-	
-				$this->zerosEsquerda ( ($_seq + 1), 6 ) . // NÚMERO SEQUENCIAL DO REGISTRO - TAMANHO 6 / 395-400 NUM
-				"\r\n";
-				
-				if ($lstTransacoes [($_i - 1)] ["status_geral"] == 0){
-					if ($lstTransacoes [($_i - 1)] ["tem_multa"]){
-						$_seq++;
-						$multa = number_format($lstTransacoes [($_i - 1)]  ["multa"],2);
-						if ($lstTransacoes [($_i - 1)] ["tem_multa"] == 2)  {
-							$multa = "00000".$this->removePontosVirgulas($multa, 7);
-						}
-						else $multa = $this->removePontosVirgulas($multa, 12);
-						$regTransacao .= "5" .
-								"99" . //COBRANÇA DE MULTA
-								$this->zerosEsquerda($lstTransacoes [($_i - 1)] ["tem_multa"], 1) .
-								$data_vencimento->add(new DateInterval('P1D'))->format ( 'dmy' ) .
-								$multa .
-								$this->gerarEspacosBrancos(372) .
-								$this->zerosEsquerda(($_seq + 1), 6) .
-								"\r\n";
+				$dias_desconto = 0;
+				$data_limite_desconto = clone $data_vencimento;
+				$data_limite_desconto->sub ( new DateInterval ( 'P' . $dias_desconto . 'D' ) );
+				$valor_desconto_boleto = $this->removePontosVirgulas ( number_format ( $lstTransacoes [($_i - 1)] ["valor_desconto"], 2 ), 13 );
+				$tipo_inscricao_pagador = $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["tipo_inscricao_pagador"], 2 );
+				$cpf_cnpj_pagador = $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["inscricao_pagador"], 14 );
+				$tipo_inscricao_beneficiario = "02";
+				$cpf_cnpj_beneficiario = $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["CNPJ"], 14 );
+				$cep_pagador = explode ( "-", $lstTransacoes [($_i - 1)] ["cep_pagador"] );
+				$prefixo_cep_pagador = str_replace ( ".", "", $cep_pagador [0] );
+				$prefixo_cep_pagador = $this->zerosEsquerda ( $prefixo_cep_pagador, 5 );
+				$sufixo_cep_pagador = $this->zerosEsquerda ( $cep_pagador [1], 3 );
+				$variacaoCarteira = str_replace ( "-", "", $lstTransacoes [($_i - 1)] ["codigo_variacao_carteira_banco_brasil"] );
+					
+					
+				$regTransacao .=
+					/*IDENTIFICAÇÃO EMPRESA BENEFICIÁRIA - TAMANHO 17 / 021-037 ALFA*/
+					"7" . // IDENTIFICAÇÃO DO REGISTRO - TAMANHO 1 / 001-001 NUM DEFAULT '7'
+					$tipo_inscricao_beneficiario . // IDENTIFICAÇÃO TIPO INSCRIÇÃO DO BENEFICIARIO - TAMANHO 2 / 002-003 NUM
+					$cpf_cnpj_beneficiario . // NÚMERO INSCRIÇÃO DO BENEFICIARIO - TAMANHO 14 / 004-017 NUM
+					$this->zerosEsquerda ( $agencia, 4 ) . // agencia s/ digito - TAMANHO 4 / 018-021 ALFA
+					$this->zerosEsquerda ( $dg_agencia, 1 ) . // digito agencia - TAMANHO 1 / 022-022 ALFA
+					$this->zerosEsquerda ( $conta, 8 ) . // conta corrente - TAMANHO 8 / 023-030 ALFA
+					$this->zerosEsquerda ( $dg_conta, 1 ) . // conta corrente - TAMANHO 1 / 031-031 ALFA
+					$this->zerosEsquerda ( $lstTransacoes [0] ["num_convenio_banco_brasil"], 7 ) . // Número do Convênio - TAMANHO 7 / 032-038 ALFA
+					// $this->gerarEspacosZeros ( 19 )
+					/* FIM IDENTIFICAÇÃO EMPRESA BENEFICIÁRIA - TAMANHO 17 / 021-037 ALFA */
+					
+					$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["id_transacao"], 25 ) . // CÓDIGO DE CONTROLE DA EMPRESA - TAMANHO 25 / 039-063 ALFA (será o código da tabela transação)
+						
+					// NOSSO NÚMERO
+					$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["num_convenio_banco_brasil"], 7 ) . // Número convênio - TAMANHO 7 / 064-070
+					$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["id_origem"] , 1 ) .
+					$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["fk_pedido_pagamento"], 9 ) . // IDENTIFICAÇÃO DO TÍTULO NO BANCO - TAMANHO 9 / 071-080 NUM (NOSSO NÚMERO)
+					// FIM NOSSO NÚMERO
+					
+					$this->gerarEspacosZeros ( 2 ) . // número da prestação - TAMANHO 2 / 081-082 NUM
+					$this->gerarEspacosZeros ( 2 ) . // grupo de valor - TAMANHO 2 / 083-084 NUM
+					$this->gerarEspacosBrancos ( 2 ); // USO FEBRABAN - TAMANHO 3 / 085-086 BRANCOS
+					
+					switch ($lstTransacoes[($_i - 1)] ["fk_status"]){
+						case 8: //REGISTRAR
+							$regTransacao .= "00"; //ausencia de instruções
+							break;
+						case 11: //CANCELAR
+							$regTransacao .= "44";//BAIXA
+							break;
+						case 12: //PROTESTAR
+							$regTransacao .= "00";//protestar em 5 dias úteis
+							break;
 					}
-				}
-				
-				$_seq++;
-				
+// 					$this->gerarEspacosBrancos ( 1 ) . // Indicativo de Mensagem ou Sacador/Avalista - TAMANHO 1 / 088-088 branco ( Poderá ser informada nas posições 352 a 391 qualquer mensagem para ser impressa no boleto.)
+					
+					$regTransacao .= $this->gerarEspacosBrancos ( 3 ) . // Indicativo de Mensagem ou Sacador/Avalista - TAMANHO 3 / 089-091 branco
+					$this->zerosEsquerda ( $variacaoCarteira, 3 ) . // Variação da carteira - tamanho 3 / 092-094
+					$this->gerarEspacosZeros ( 1 ) . // conta caução - tamanho 1 / 095-095 "0"
+					$this->gerarEspacosZeros ( 6 ); // número borderô - tamanho 6 / 096-101
+					if ($lstTransacoes[($_i - 1)]["tipo_cobranca_banco_brasil"] != null)
+						$regTransacao .= $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["tipo_cobranca_banco_brasil"], 5 );
+					else
+						$regTransacao .= $this->gerarEspacosBrancos(5);
+					// 				($lstTransacoes[($_i - 1)]["tipo_cobranca_banco_brasil"] == null)?($this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["tipo_cobranca_banco_brasil"], 5 )):$this->gerarEspacosBrancos(5) . // Tipo de Cobrança - tamanho 5 / 102-106
+					$regTransacao .= $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["codigo_carteira"], 2 ) ; // Carteira - tamanho 2 / 107-108
+					switch ($lstTransacoes[($_i - 1)] ["fk_status"]){
+						case 8: //REGISTRAR
+							$regTransacao .= "01";
+							break;
+						case 11: //CANCELAR
+							$regTransacao .= "02";
+							break;
+						case 12: //PROTESTAR
+							$regTransacao .= "09";
+							break;
+					}
+					// 				"01" . // COMANDO VIDE MANUAL - tamanho 2 / 109-110
+					$regTransacao .= $this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["id_origem"] , 1 ) .
+					$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["fk_pedido"], 9 ) . // Seu Número/Número do Título Atribuído pelo Cedente - TAMANHO 10 / 111-120 NUM
+					$data_vencimento->format ( 'dmy' ) . // DATA VENCIMENTO TITULO - TAMANHO 6 / 121-126 NUM
+			
+					$valor . // VALOR DO TÍTULO - TAMANHO 13 / 127-139 NUM
+					$this->zerosEsquerda ( $lstTransacoes [0] ["codigo_banco"], 3 ) . // CÓDIGO DO BANCO NA COMPENSAÇÃO - TAMANHO 3 / 140-142 NUM
+			
+					$this->gerarEspacosZeros ( 4 ) . // prefixo agencia cobradora - TAMANHO 4 / 143-146 NUM
+					$this->gerarEspacosBrancos ( 1 ) . // digito agencia cobradora - TAMANHO 1 / 147-147
+					$especie_titulo . // ESPECIE titulo - tamanho 2 / 148-149
+					$this->brancosDireita ( $lstTransacoes [($_i - 1)] ["aceite_boleto"], 1 ) . // aceito do título - tamanho 1 / 150-150
+					$dataTitulo->format ( 'dmy' ) . // data do titulo - tamanho 6 / 151-156
+			
+					$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["primeira_instrucao_codificada"], 2 ) . // tamanho 2 / 157-158
+					$this->zerosEsquerda ( $lstTransacoes [($_i - 1)] ["segunda_instrucao_codificada"], 2 ) . // tamanho 2 / 159-160
+					$valor_mora . // VALOR ACRESC POR DIA DE ATRASO - TAMANHO 13 / 161-173 NUM
+					$this->gerarEspacosZeros ( 6 ) .
+					// 				$data_limite_desconto->format ( 'dmy' ) . // DATA LIMITE PARA CONCESSÃO DESCONTO - TAMANHO 6 / 174-179 NUM
+					$valor_desconto_boleto . // VALOR DESCONTO - TAMANHO 13 / 180-192 NUM
+					$valor_iof . // VALOR IOF - TAMANHO 13 / 192-205 NUM
+					$valor_abatimento . // VALOR ABATIMENTO A SER CONCEDIDO/CANCELADO - TAMANHO 13 / 206-218 NUM
+			
+					$tipo_inscricao_pagador . // tamanho 2 / 219-220
+					$cpf_cnpj_pagador . // tamanho 14 / 221-234
+			
+					$this->brancosDireita ( $this->replaceCharAscensionToUpper($lstTransacoes [($_i - 1)] ["nome_pagador"]), 37 ) . // NOME PAGADOR - TAMANHO 37 / 235-271 ALFA
+					$this->gerarEspacosBrancos ( 3 ) . // tamanho 6 / 272-274
+					$this->brancosDireita($this->replaceCharAscensionToUpper($lstTransacoes [($_i - 1)] ["logradouro_pagador"]). " " . $lstTransacoes [($_i - 1)] ["numero_end_pagador"]. " " . $this->replaceCharAscensionToUpper($lstTransacoes [($_i - 1)] ["complemento_end_pagador"]), 40) .
+					// 				$this->gerarEspacosBrancos ( 40 ) . // ENDEREÇO COMPLETO - TAMANHO 40 / 275-314 ALFA
+					$this->brancosDireita($this->replaceCharAscensionToUpper($lstTransacoes [($_i - 1)] ["bairro_pagador"]), 12) .
+					// 				$this->gerarEspacosBrancos ( 12 ) . // Bairro pagador - TAMANHO 12 / 315-326 ALFA
+					$prefixo_cep_pagador . // CEP PAGADOR - TAMANHO 5 / 327-331 NUM
+					$sufixo_cep_pagador . // SUFIXO CEP - TAMANHO 3 / 332-334 NUM
+					$this->brancosDireita($this->replaceCharAscensionToUpper($lstTransacoes [($_i - 1)] ["cidade_pagador"]), 15) .
+					// 				$this->gerarEspacosBrancos ( 15 ) . // CIDADE PAGADOR - TAMANHO 15 / 335-349 ALFA
+					$this->brancosDireita($this->replaceCharAscensionToUpper($lstTransacoes [($_i - 1)] ["uf_pagador"]), 2) .
+					// 				$this->gerarEspacosBrancos ( 2 ) . // uf PAGADOR - TAMANHO 2 / 350-351 ALFA
+					$this->gerarEspacosBrancos ( 40 ) . // MENSAGEM AO PAGADOR - TAMANHO 2 / 352-391 ALFA
+					$this->gerarEspacosBrancos ( 2 ) . // NÚMERO DE DIAS PARA PROTESTO CASO “Comando” = 01 E “instrução codificada” = 06 - TAMANHO 2 / 392-393 ALFA
+					$this->gerarEspacosBrancos ( 1 ) . // BRANCOS - TAMANHO 2 / 350-351 ALFA
+			
+					$this->zerosEsquerda ( ($_seq + 1), 6 ) . // NÚMERO SEQUENCIAL DO REGISTRO - TAMANHO 6 / 395-400 NUM
+					"\r\n";
+			
+					if ($lstTransacoes [($_i - 1)] ["fk_status"] == 8){
+						if ($lstTransacoes [($_i - 1)] ["tem_multa"]){
+							$_seq++;
+							$multa = number_format($lstTransacoes [($_i - 1)]  ["multa"],2);
+							if ($lstTransacoes [($_i - 1)] ["tem_multa"] == 2)  {
+								$multa = "00000".$this->removePontosVirgulas($multa, 7);
+							}
+							else $multa = $this->removePontosVirgulas($multa, 12);
+							$regTransacao .= "5" .
+									"99" . //COBRANÇA DE MULTA
+									$this->zerosEsquerda($lstTransacoes [($_i - 1)] ["tem_multa"], 1) .
+									$data_vencimento->add(new DateInterval('P1D'))->format ( 'dmy' ) .
+									$multa .
+									$this->gerarEspacosBrancos(372) .
+									$this->zerosEsquerda(($_seq + 1), 6) .
+									"\r\n";
+						}
+					}
+		
+	
+			$_seq++;
 		}
 		
 
@@ -850,35 +989,44 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		return $conteudo;
 			
 	}
-	public function gerarRemessaBancodoBrasil400($lstTransacoes, $empresa) {
-		$sequencial = $this->getSequencial ( $lstTransacoes [0] ["id_operadora_empresa"] );
+	public function gerarRemessaBancodoBrasil400($lstTransacoes, $empresa, $sequencial, $dataReferencia) {
+// 		$sequencial = $this->getSequencial ( $lstTransacoes [0] ["id_operadora_empresa"] );
 		
 		$dia = date ( 'd' );
 		$mes = date ( 'm' );
-		$seq = $this->zerosEsquerda ( dechex ( $lstTransacoes [0] ["num_sequencial_remessa"] ), 2 );
+		$seq = $this->zerosEsquerda ( dechex ( $sequencial ), 2 );
 		$nome = "BB$dia$mes$seq.REM";
 		$fp = fopen ( $empresa."/".$nome, "w" );
 		
 		$dataAtual = date ( 'dmy' );
-		$escreve = fwrite ( $fp, $this->montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual, $empresa ) );
+		$escreve = fwrite ( $fp, $this->montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual, $empresa, $sequencial ) );
 		// Fecha o arquivo
 		fclose ( $fp );
 		
-		$this->updateSequencial ( $lstTransacoes [0] ["num_sequencial_remessa"], $lstTransacoes [0] ["id_operadora_empresa"] );
-		$this->updateTransacaoRemessa ( $lstTransacoes, $dataAtual, $nome, $lstTransacoes [0] ["num_sequencial_remessa"] , $lstTransacoes [0] ["id_operadora_empresa"], 0);
-		return $nome;
+		
+		
+		$this->updateSequencial ( $sequencial, $lstTransacoes [0] ["id_operadora_empresa"] );
+		$retorno = $this->updateTransacaoRemessa ( $lstTransacoes, $dataAtual, $nome, $sequencial , $lstTransacoes [0] ["id_operadora_empresa"], 0, $dataReferencia);
+// 		updateTransacaoRemessa inserir data de referencia na tabela remessas
+		if ($retorno["CodStatus"] == 1)
+			return $nome;
+		return $retorno["Msg"];
 	}
-	public function remontarRemessaBancodoBrasil400($lstTransacoes, $empresa, $fkRemessa) {
-		$nome = $lstTransacoes [0] ["nome_arquivo"];
+	public function remontarRemessaBancodoBrasil400($lstTransacoes, $empresa, $remessa) {
+// 		print_r($remessa);
+		$nome = $remessa ["nome_arquivo"];
 		$fp = fopen ( $empresa."/".$nome, "w" );
 		
 		$dataAtual = date ( 'dmy' );
-		$escreve = fwrite ( $fp, $this->montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual, $empresa ) );
+		$escreve = fwrite ( $fp, $this->montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual, $empresa, $remessa["sequencial_remessa"] ) );
 		// Fecha o arquivo
 		fclose ( $fp );
 		
-		$this->updateSequencial ( $lstTransacoes [0] ["num_sequencial_remessa"], $lstTransacoes [0] ["id_operadora_empresa"] );
-		$this->updateTransacaoRemessa ( $lstTransacoes, $dataAtual, $nome, $lstTransacoes [0] ["num_sequencial_remessa"] , $lstTransacoes [0] ["id_operadora_empresa"], $fkRemessa );
+// 		$this->updateSequencial ( $lstTransacoes [0] ["num_sequencial_remessa"], $lstTransacoes [0] ["id_operadora_empresa"] );
+		$retorno = $this->updateTransacaoRemessa ( $lstTransacoes, $dataAtual, $nome, $remessa["sequencial_remessa"] , $lstTransacoes [0] ["id_operadora_empresa"], $remessa ["id_remessa"], null);
+		if ($retorno["CodStatus"] == 1)
+			return $nome;
+		return $retorno["Msg"];
 	}
 	
 	
@@ -923,7 +1071,7 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		return $lstEmpresa;
 	}
 	public function getFormaPagamentoOperadoraEmpresa($codEmpresa, $formaPagamento, $codOp) {
-		$sql = "SELECT forma_pagamento_operadora_empresa.id_forma_pagamento_operadora_empresa FROM forma_pagamento_operadora_empresa
+		$sql = "SELECT forma_pagamento_operadora_empresa.id_forma_pagamento_operadora_empresa, forma_pagamento.descricao_forma_pagamento FROM forma_pagamento_operadora_empresa
 					LEFT OUTER JOIN operadora_empresa ON forma_pagamento_operadora_empresa.fk_operadora_empresa = operadora_empresa.id_operadora_empresa
 					LEFT OUTER JOIN forma_pagamento ON forma_pagamento_operadora_empresa.fk_forma_pagamento = forma_pagamento.id_forma_pagamento
 				WHERE operadora_empresa.fk_empresa = $codEmpresa AND forma_pagamento_operadora_empresa.fk_forma_pagamento = $formaPagamento AND operadora_empresa.fk_operadora = $codOp";
@@ -954,17 +1102,28 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 			);
 	}
 	public function insertTransaction($dados, $fkFormaPgOpEm) {
+		$identificador = "";
+		if ($fkFormaPgOpEm["descricao_forma_pagamento"] == "Boleto à vista")
+			$identificador = $dados ['origem'] . $this->zerosEsquerda($dados ['codigoPagamento'] , 9);
 		try {
-			$sql = "INSERT INTO Transacao (	fk_pedido_pagamento, fk_pedido, fk_forma_pagamento_operadora_empresa, valor_transacao, data_hora_transacao,
-										data_vencimento_boleto, tipo_inscricao_pagador, inscricao_pagador, cep_pagador, nome_pagador, id_origem, num_parcelas, valor_parcela,
-										logradouro_pagador, complemento_end_pagador, numero_end_pagador, bairro_pagador, cidade_pagador, uf_pagador)
-						values (" . $dados ['codigoPagamento'] . ", " . $dados ['codigoOrigem'] . ", " . $fkFormaPgOpEm . ", " . $dados ['valorDocumento'] . ",
-									DATE '" . $dados ['dataDocumento'] . "', DATE '" . $dados ['dataVencimento'] . "', " . $dados ['tipoInscricaoPagador'] . ", '" . $dados ['inscricaoPagador'] . "',
-									'" . $dados ['cep'] . "', '" . $dados ['nomePagador'] . "', " . $dados ['origem'] . ", " . $dados ['numParcelas'] . ", " . $dados ['valorParcelas'] . ",
-									'" . $dados ['logradouro'] . "', '" . $dados ['complemento'] . "', '" . $dados ['numero'] . "', '" . $dados ['bairro'] . "', '" . $dados ['cidade'] . "', '" . $dados ['uf'] . "')";
+			$sql = "INSERT INTO transacao (	
+						fk_pedido_pagamento, fk_pedido, fk_forma_pagamento_operadora_empresa, valor_transacao, data_criacao_origem,
+						data_vencimento_boleto, tipo_inscricao_pagador, inscricao_pagador, cep_pagador, nome_pagador, id_origem, num_parcelas, valor_parcela,
+						logradouro_pagador, complemento_end_pagador, numero_end_pagador, bairro_pagador, cidade_pagador, uf_pagador, identificador)
+					VALUES (" . $dados ['codigoPagamento'] . ", " . $dados ['codigoOrigem'] . ", " . $fkFormaPgOpEm["id_forma_pagamento_operadora_empresa"] . ", " . 
+						$dados ['valorDocumento'] . ", DATE '" . $dados ['dataDocumento'] . "', DATE '" . $dados ['dataVencimento'] . "', " . 
+						$dados ['tipoInscricaoPagador'] . ", '" . $dados ['inscricaoPagador'] . "', '" . $dados ['cep'] . "', '" . $dados ['nomePagador'] . "', " . 
+						$dados ['origem'] . ", " . $dados ['numParcelas'] . ", " . $dados ['valorParcelas'] . ", '" . $dados ['logradouro'] . "', '" . 
+						$dados ['complemento'] . "', '" . $dados ['numero'] . "', '" . $dados ['bairro'] . "', '" . $dados ['cidade'] . "', '" . $dados ['uf'] . 
+						"', '$identificador')";
 			
 			if ($this->banco->getConexaoBanco ()->query ( $sql )) {
 				$id = $this->banco->getConexaoBanco ()->insert_id;
+				
+				$sql = 	"INSERT INTO movimentacao (
+							fk_transacao, fk_status, data_remessa)
+						VALUES ($id, 8, DATE '" . $dados ['dataDocumento'] . "')";
+				$this->banco->getConexaoBanco ()->query ( $sql );
 				return array (
 						'CodStatus' => 1,
 						'Msg' => "Success!",
@@ -1069,12 +1228,18 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		}
 	}
 	public function getPagamentosPendentes($codEmpresa) {
-		$sql = "SELECT transacao.*, operadoras.nome_operadora, operadora_empresa.*, forma_pagamento.* FROM TRANSACAO
+		$sql = "SELECT transacao.*, operadoras.nome_operadora, operadora_empresa.*, forma_pagamento.*, status.*, movimentacao.* FROM TRANSACAO
 			LEFT OUTER JOIN forma_pagamento_operadora_empresa on transacao.fk_forma_pagamento_operadora_empresa = forma_pagamento_operadora_empresa.id_forma_pagamento_operadora_empresa
 			INNER JOIN forma_pagamento ON forma_pagamento_operadora_empresa.fk_forma_pagamento = forma_pagamento.id_forma_pagamento
 			INNER JOIN operadora_empresa ON forma_pagamento_operadora_empresa.fk_operadora_empresa = operadora_empresa.id_operadora_empresa
 			INNER JOIN operadoras ON operadora_empresa.fk_operadora = operadoras.id_operadora
-			WHERE transacao.status_geral = 0 AND operadora_empresa.fk_empresa = $codEmpresa ORDER BY transacao.id_transacao DESC LIMIT 10";
+			
+			INNER JOIN movimentacao ON movimentacao.fk_transacao = transacao.id_transacao AND movimentacao.id_movimentacao = ( 
+				SELECT movimentacao.id_movimentacao FROM movimentacao
+					WHERE movimentacao.fk_transacao = transacao.id_transacao ORDER BY movimentacao.id_movimentacao DESC LIMIT 1 
+			)
+			INNER JOIN status ON movimentacao.fk_status = status.id_status 
+			WHERE movimentacao.fk_status IN ( 1, 3, 5, 8, 11, 12) AND operadora_empresa.fk_empresa = $codEmpresa ORDER BY transacao.id_transacao DESC LIMIT 10";
 		// echo "<br>".$sql."<br>";
 		$consulta = $this->banco->getConexaoBanco ()->query ( $sql );
 		$lstPgto = array ();
@@ -1093,13 +1258,18 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		$previous = false;
 		
 		$sql = "SELECT  transacao.*, operadoras.nome_operadora, operadoras.codigo_banco,
-						forma_pagamento.*, operadora_empresa.*, empresa.NOME, empresa.CNPJ
+						forma_pagamento.*, operadora_empresa.*, empresa.NOME, empresa.CNPJ, status.*, movimentacao.*
 							FROM TRANSACAO
 						LEFT OUTER JOIN forma_pagamento_operadora_empresa ON transacao.fk_forma_pagamento_operadora_empresa = forma_pagamento_operadora_empresa.id_forma_pagamento_operadora_empresa
 						INNER JOIN operadora_empresa ON forma_pagamento_operadora_empresa.fk_operadora_empresa = operadora_empresa.id_operadora_empresa
 						INNER JOIN operadoras ON operadora_empresa.fk_operadora = operadoras.id_operadora
 						INNER JOIN empresa ON operadora_empresa.fk_empresa = empresa.CODIGO
-						INNER JOIN forma_pagamento ON forma_pagamento_operadora_empresa.fk_forma_pagamento = forma_pagamento.id_forma_pagamento";
+						INNER JOIN forma_pagamento ON forma_pagamento_operadora_empresa.fk_forma_pagamento = forma_pagamento.id_forma_pagamento
+						INNER JOIN movimentacao ON movimentacao.fk_transacao = transacao.id_transacao AND movimentacao.id_movimentacao = ( 
+							SELECT movimentacao.id_movimentacao FROM movimentacao
+								WHERE movimentacao.fk_transacao = transacao.id_transacao ORDER BY movimentacao.id_movimentacao DESC LIMIT 1 
+						)
+						INNER JOIN status ON movimentacao.fk_status = status.id_status ";
 		
 		if ($identificador != "" && $identificador != 0) {
 			if ($previous)
@@ -1107,7 +1277,7 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 			else
 				$sql .= " WHERE ";
 			$previous = true;
-			$whereIdentificador = "(transacao.tid_transacao_cielo = '$identificador' OR transacao.num_sequencial_rede = '$identificador' OR transacao.identificador_boleto = '$identificador')";
+			$whereIdentificador = "(transacao.identificador = '$identificador')";
 			$sql .= $whereIdentificador;
 		}
 		
@@ -1163,7 +1333,7 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 			else
 				$sql .= " WHERE ";
 			$previous = true;
-			$wheredataPeriodo = "(transacao.data_hora_transacao BETWEEN '" . $dataI . "' AND '" . $dataF . "')";
+			$wheredataPeriodo = "(transacao.data_criacao_origem BETWEEN '" . $dataI . "' AND '" . $dataF . "')";
 			$sql .= $wheredataPeriodo;
 		}
 		
@@ -1177,14 +1347,41 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 			$whereStatus = "(";
 			for($i = 0; $i < (count ( $listaStatus ) - 1); $i ++) {
 				if ($i == (count ( $listaStatus ) - 2))
-					$whereStatus .= "transacao.status_geral = " . $listaStatus [$i] . "";
+					$whereStatus .= "transacao.estado = '" . $listaStatus [$i] . "'";
 				else
-					$whereStatus .= "transacao.status_geral = " . $listaStatus [$i] . " OR ";
+					$whereStatus .= "transacao.estado = '" . $listaStatus [$i] . "' OR ";
 			}
 			$whereStatus .= ")";
 			$sql .= $whereStatus;
 		}
+		
 		//INSERIR AQUI CONDIÇÃO DE FORMA DE PAGAMENTO
+		
+		if ($listaFormaPgto [0] !== "") {
+			if ($previous)
+				$sql .= " AND ";
+			else
+				$sql .= " WHERE ";
+						
+			$previous = true;
+			$whereFormPgto = "(";
+			for($i = 0; $i < (count ( $listaFormaPgto ) - 1); $i ++) {
+				if ($i == (count ( $listaFormaPgto ) - 2)){
+					if ($listaFormaPgto [$i] == 0)
+						$whereFormPgto .= "forma_pagamento.descricao_forma_pagamento = 'Boleto à vista'";
+					else 
+						$whereFormPgto .= "forma_pagamento.descricao_forma_pagamento <> 'Boleto à vista'";
+				}else{
+					if ($listaFormaPgto [$i] == 0)
+						$whereFormPgto .= "forma_pagamento.descricao_forma_pagamento = 'Boleto à vista' OR ";
+					else
+						$whereFormPgto .= "forma_pagamento.descricao_forma_pagamento <> 'Boleto à vista' OR ";
+				}
+			}
+			$whereFormPgto .= ")";
+			$sql .= $whereFormPgto;
+		}
+		
 		if ($valorTransacao != "") {
 			if ($previous)
 				$sql .= " AND ";
@@ -1199,11 +1396,11 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 			$sql .= $whereValor;
 		}
 		
-		//echo $sql;
+// 		echo $sql;
 		return $this->buscaTransacoesPersonalizada ( $sql, $_SESSION ["dados_acesso"] [0] ["CODIGO"] );
 	}
 	
-	public function liquidarPagamento($cod_empresa, $origem, $fk_pagamento, $data_pagamento, $valor_pagamento){
+	public function liquidarPagamento($cod_empresa, $origem, $fk_pagamento, $data_pagamento, $valor_pagamento, $newStatus){
 		$data_pag = new DateTime( date("dmy", strtotime($data_pagamento)) );
 		$valor = ltrim($valor_pagamento, '0');
 		$valor = ($valor/100);
@@ -1213,15 +1410,14 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 				LEFT OUTER JOIN operadora_empresa ON forma_pagamento_operadora_empresa.fk_operadora_empresa = operadora_empresa.id_operadora_empresa
 				INNER JOIN empresa ON operadora_empresa.fk_empresa = empresa.CODIGO
 				SET 
-					transacao.status_geral = 9,
+					movimentacao.fk_status = $newStatus,
 					transacao.data_pagamento = '".$data_pag->format('Y-m-d')."',
 					transacao.valor_pago = $valor
 				WHERE empresa.CODIGO = $cod_empresa AND transacao.id_origem = $origem AND transacao.fk_pedido_pagamento = $fk_pagamento";
-// 		echo "\n$sql\n";
 		$result = $this->banco->getConexaoBanco ()->query ( $sql );
-// 		$result->close ();
-// 		return $total;
 	}
+	
+	
 	
 	public function getTransacaoByNossoNumero($cod_empresa, $origem, $fk_pagamento){
 		$sql = "SELECT transacao.nome_pagador FROM TRANSACAO
@@ -1258,7 +1454,7 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 // 		echo "inserindo registro novo";
 		try {
 			$sql = "INSERT INTO transacao (	
-						fk_pedido_pagamento, fk_pedido, id_origem, fk_forma_pagamento_operadora_empresa, valor_transacao, data_hora_transacao,
+						fk_pedido_pagamento, fk_pedido, id_origem, fk_forma_pagamento_operadora_empresa, valor_transacao, data_criacao_origem,
 						data_vencimento_boleto, tipo_inscricao_pagador, inscricao_pagador, cep_pagador, nome_pagador, 
 						logradouro_pagador, complemento_end_pagador, numero_end_pagador, bairro_pagador, cidade_pagador, uf_pagador, fk_transacao,
 						status_geral, num_parcelas, valor_parcela
@@ -1305,12 +1501,90 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 				);
 			}
 		} catch ( Exception $e ) {
-			echo "\n\n$sql\n\n";
 			return array (
 					'CodStatus' => 3,
 					'Msg' => $e->getMessage ()
 			);
 		}
 	}
+	
+	public function updateStatusTransaction($idT, $newS, $fkRemessa){
+		$dataRemessa = new DateTime();
+		$sql = "INSERT INTO movimentacao (fk_transacao, fk_status, fk_remessa, data_movimentacao) VALUES ($idT, $newS, $fkRemessa, DATE '" . $dataRemessa->format ( 'Y-m-d' ) . "')";
+		$result = $this->banco->getConexaoBanco ()->query ( $sql );
+		
+		$sql = "UPDATE transacao 
+					INNER JOIN movimentacao ON movimentacao.fk_transacao = transacao.id_transacao AND movimentacao.id_movimentacao = ( 
+						SELECT movimentacao.id_movimentacao FROM movimentacao
+							WHERE movimentacao.fk_transacao = transacao.id_transacao ORDER BY movimentacao.id_movimentacao DESC LIMIT 1 
+					)
+				    INNER JOIN status ON status.id_status = movimentacao.fk_status
+				SET transacao.estado = status.estado
+				WHERE transacao.id_transacao = $idT";
+		$result = $this->banco->getConexaoBanco ()->query ( $sql );
+	}
+	
+	public function updateStatusTransactionReturn($transacao, $newS){
+		$dataEntrada = new DateTime();
+		$dataProcessamento = new DateTime( date("d/m/Y", strtotime($transacao["data_processamento"])) );
+		$sql = "INSERT INTO movimentacao (fk_transacao, fk_status, fk_remessa, data_movimentacao, data_processamento_operadora) VALUES (" . 
+					$transacao["id_transacao"] . 
+					", $newS, null, DATE '" . 
+					$dataEntrada->format ( 'Y-m-d' ) . 
+					"', DATE '" . $dataProcessamento->format ( 'Y-m-d' ) . "')";
+		$result = $this->banco->getConexaoBanco ()->query ( $sql );
+		
+		$sql = "UPDATE transacao 
+					INNER JOIN movimentacao ON movimentacao.fk_transacao = transacao.id_transacao AND movimentacao.id_movimentacao = ( 
+						SELECT movimentacao.id_movimentacao FROM movimentacao
+							WHERE movimentacao.fk_transacao = transacao.id_transacao ORDER BY movimentacao.id_movimentacao DESC LIMIT 1 
+					)
+				    INNER JOIN status ON status.id_status = movimentacao.fk_status
+				SET transacao.estado = status.estado
+				WHERE transacao.id_transacao = " . $transacao["id_transacao"];
+		$result = $this->banco->getConexaoBanco ()->query ( $sql );
+	}
+	
+	public function updateStatusTransactionPaymentReturn($transacao, $newS){
+		$dataEntrada = new DateTime();
+		$dataProcessamento = new DateTime( date("d/m/Y", strtotime($transacao["data_processamento"])) );
+		$dataPagamento = new DateTime( date("d/m/Y", strtotime($transacao["data_pagamento"])));
+		$sql = "INSERT INTO movimentacao (fk_transacao, fk_status, fk_remessa, data_movimentacao, data_processamento_operadora) VALUES (" . 
+					$transacao["id_transacao"] . 
+					", $newS, null, DATE '" . 
+					$dataEntrada->format ( 'Y-m-d' ) . 
+					"', DATE '" . $dataProcessamento->format ( 'Y-m-d' ) . "')";
+		$result = $this->banco->getConexaoBanco ()->query ( $sql );
+		
+		$sql = "UPDATE transacao 
+					INNER JOIN movimentacao ON movimentacao.fk_transacao = transacao.id_transacao AND movimentacao.id_movimentacao = ( 
+						SELECT movimentacao.id_movimentacao FROM movimentacao
+							WHERE movimentacao.fk_transacao = transacao.id_transacao ORDER BY movimentacao.id_movimentacao DESC LIMIT 1 
+					)
+				    INNER JOIN status ON status.id_status = movimentacao.fk_status
+				SET 
+					transacao.estado = status.estado,
+					transacao.data_pagamento = '" . $dataPagamento->format('Y-m-d') . "',
+					transacao.valor_pago = " . $transacao["valor_pago"] . "
+				WHERE transacao.id_transacao = " . $transacao["id_transacao"];
+		$result = $this->banco->getConexaoBanco ()->query ( $sql );
+	}
+	
+	
+	public function getDescricaoStatusTransaction($idS){
+		
+		$sql = "SELECT status.descricao_status FROM status WHERE status.id_status = $idS";
+	
+		$consulta = $this->banco->getConexaoBanco ()->query ( $sql );
+		$retorno = array ();
+		while ( $linha = $consulta->fetch_array ( MYSQLI_ASSOC ) ) {
+			array_push ( $retorno, $linha );
+		}
+		$consulta->close ();
+		
+		return $retorno[0];
+	}
+	
+	
 }
 	

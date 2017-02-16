@@ -32,8 +32,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
-				<button type="button" class="btn btn-primary"
-					onclick="gerarRemessa('<?= BaseProjeto ?>')">Gerar remessa</button>
+				<button type="button" class="btn btn-primary" onclick="gerarRemessa('<?= BaseProjeto ?>')">Gerar remessa</button>
 			</div>
 		</div>
 	</div>
@@ -98,7 +97,7 @@
 	    language: "pt-BR",
 	    multidate: false,
 	    daysOfWeekHighlighted: "0",
-	    todayHighlight: true,
+	    todayHighlight: false,
 	    autoclose: true
 	});
 
@@ -112,14 +111,28 @@
 	function processarRetorno(){
 // 		console.log(JSON.stringify(listaRegistros));
 		$.ajax({
-	    	url : "../controllers/retornoController.php",
+	    	url : "<?= BaseProjeto ?>/controllers/retornoController.php",
 	        type: 'POST',
 	        data: {
 		        servico: "processarTransacoes",
 		        lstTransacoes: JSON.stringify(listaRegistros)
 	        },
-	        success: function (data) {
-		        console.log("Retornou: " + data);
+	        success: function (e) {
+	        	if (e !== 'null') {
+					var obj = JSON.parse(e);
+					switch (obj[0]) {
+						case 1:
+							$('#modalRetorno').modal('hide');
+			 	        	location.reload();
+							break;
+						case 2:
+							alert("Este retorno já foi processado anteriormente no sistema!");
+							break;
+						default:
+							break;
+					}
+				} else
+					alert("Ops, houve uma falha. Tente novamente mais tarde!");
 	        }
 	    });
 	}
@@ -128,17 +141,16 @@
 	    var formData = new FormData(this);
 
 	    $.ajax({
-	    	url : "../controllers/retornoController.php",
+	    	url : "<?= BaseProjeto ?>/controllers/retornoController.php",
 	        type: 'POST',
 	        data: formData,
 	        success: function (data) {
 // 	            console.log(data);
 	            var obj = JSON.parse(data);
-// 	            console.log(obj);
+	            console.log(obj);
 	            listaRegistros = obj;
-    			if (obj.length == 0){
-        			
-    				$("#tableRetorno").html("<table id=\"transacoes\" class=\"table table-hover table-striped \"><tr><td colspan='12' align='center'>Nenhum Registro encontrado!</td></tr></tbody></table>");
+    			if (obj.transacoes.length == 0){
+        			$("#tableRetorno").html("<table id=\"transacoes\" class=\"table table-hover table-striped \"><tr><td colspan='12' align='center'>Nenhum Registro encontrado!</td></tr></tbody></table>");
     				$("#btnProcessarRetorno").addClass("hidden");
         		}else{
     				$("#tableRetorno").html(construirLista(obj));
@@ -158,11 +170,12 @@
 						"<tr>" +
 							"<th class=\"col-md-1\"><center>NOSSO NÚMERO</center></th>" +
 							"<th class=\"col-md-1\"><center>NOME</center></th>" +
-							"<th class=\"col-md-1\"><center>VENCIMENTO</center></th>" +
+							"<th class=\"col-md-1\"><center>DATA VENC.</center></th>" +
 							"<th class=\"col-md-1\"><center>VALOR</center></th>" +
-							"<th class=\"col-md-1\"><center>PAGAMENTO</center></th>" +
-							"<th class=\"col-md-1\"><center>V. PAGO</center></th>" +
-							"<th class=\"col-md-1\"><center>CRÉDITO</center></th>" +
+							"<th class=\"col-md-1\"><center>DATA PAGTO</center></th>" +
+							"<th class=\"col-md-1\"><center>PAGO</center></th>" +
+							"<th class=\"col-md-1\"><center>DATA CRÉDITO</center></th>" +
+							"<th class=\"col-md-1\"><center>TAXA</center></th>" +
 							"<th class=\"col-md-1\"><center>DESCRIÇÃO</center></th>" +
 // 							"<th class=\"col-md-1\"><center></center></th>" +
 						"</tr>" +
@@ -170,14 +183,14 @@
 					"<tbody id=\"conteudo-relatorio\">";
     	
     	var trs = "";
-    	for (i in obj){
+    	for (i in obj.transacoes){
         	
     		trs += "<tr class=\"linha_relatorio\">" +
-						"<td class=\"col-md-1 valign\"><center>" + obj[i].nosso_numero + "</center></td>" +
-						"<td class=\"col-md-1 valign\"><center>" + obj[i].nome_pagador + "</center></td>" +
+						"<td class=\"col-md-1 valign\"><center>" + obj.transacoes[i].nosso_numero + "</center></td>" +
+						"<td class=\"col-md-1 valign\"><center>" + obj.transacoes[i].nome_pagador + "</center></td>" +
 						"<td class=\"col-md-1 valign\"><center>";
-				    		if (obj[i].data_vencimento){
-				    			var from = obj[i].data_vencimento.split("/");
+				    		if (obj.transacoes[i].data_vencimento){
+				    			var from = obj.transacoes[i].data_vencimento.split("/");
 				    			var dt = new Date(from[2], from[1] - 1, from[0]);
 				            	var d, m;
 				            	if (dt.getDate() <= 9) d = "0" + dt.getDate(); else d = dt.getDate();
@@ -186,12 +199,12 @@
 							} 
 						trs += "</center></td>" +
 						"<td class=\"col-md-1 valign\"><center>R$ ";
-						obj[i].valor_titulo = parseFloat(obj[i].valor_titulo).toFixed(2);
-						trs += obj[i].valor_titulo.replace(".", ",") + "</center></td>" +
+						obj.transacoes[i].valor_titulo = parseFloat(obj.transacoes[i].valor_titulo).toFixed(2);
+						trs += obj.transacoes[i].valor_titulo.replace(".", ",") + "</center></td>" +
 						"<td class=\"col-md-1 valign\"><center>";
-							if (obj[i].valor_pago != 0){
-					    		if (obj[i].data_pagamento){
-					    			var from = obj[i].data_pagamento.split("/");
+							if (obj.transacoes[i].valor_pago != 0){
+					    		if (obj.transacoes[i].data_pagamento){
+					    			var from = obj.transacoes[i].data_pagamento.split("/");
 					    			var dt = new Date(from[2], from[1] - 1, from[0]);
 					            	var d, m;
 					            	if (dt.getDate() <= 9) d = "0" + dt.getDate(); else d = dt.getDate();
@@ -201,11 +214,11 @@
 							}else trs += " -- ";
 						trs += "</center></td>" +
 						"<td class=\"col-md-1 valign\"><center>R$ ";
-						obj[i].valor_pago = parseFloat(obj[i].valor_pago).toFixed(2);
-						trs += obj[i].valor_pago.replace(".", ",") +"</center></td>" +
+						obj.transacoes[i].valor_pago = parseFloat(obj.transacoes[i].valor_pago).toFixed(2);
+						trs += obj.transacoes[i].valor_pago.replace(".", ",") +"</center></td>" +
 						"<td class=\"col-md-1 valign\"><center>";
-				    		if (obj[i].data_credito){
-				    			var from = obj[i].data_credito.split("/");
+				    		if (obj.transacoes[i].data_credito){
+				    			var from = obj.transacoes[i].data_credito.split("/");
 				    			var dt = new Date(from[2], from[1] - 1, from[0]);
 				            	var d, m;
 				            	if (dt.getDate() <= 9) d = "0" + dt.getDate(); else d = dt.getDate();
@@ -213,20 +226,10 @@
 				            	trs +=  d + "/" + m + "/" + dt.getFullYear();
 							} 
 						trs += "</center></td>" +
-						"<td class=\"col-md-1 valign\"><center>" + obj[i].comando + " - " + obj[i].descricao_comando + "</center></td>" +
-// 						"<td class=\"col-md-1 valign\"><center>";
-// 							if (obj[i].pago){
-// 								trs += "<button type=\"button\"" +
-// 									"class=\"btn btn-success dropdown-toggle\"" +
-// 									"data-toggle=\"dropdown\"" +
-// 									"data-idt=\"1\"" +
-// 									"onclick=\"imprimirBoleto(this)\">Liquidar</button>";
-// 							}else{
-// 								trs += "--";
-// 							}
-						
-// 							trs += "</center>" + 
-// 						"</td>" +
+						"<td class=\"col-md-1 valign\"><center>R$ ";
+						obj.transacoes[i].taxa = parseFloat(obj.transacoes[i].taxa).toFixed(2);
+						trs += obj.transacoes[i].taxa.replace(".", ",") +"</center></td>" +
+						"<td class=\"col-md-1 valign\"><center>" + obj.transacoes[i].comando + " - " + obj.transacoes[i].descricao_comando + "</center></td>" +
 					"</tr>";
 			
     	}

@@ -3,7 +3,10 @@
 // 	include '../controllers/formTransacaoController.php';
 	include '../controllers/formController.php';
 	$fc = new FormController ();
-	//session_start ();
+	if (!isset($_SESSION["usuario_logado"])){
+		$_SESSION["falha_login"] = "Autenticação necessária";
+		header("location: " . BaseProjeto . "/../");
+	}
 	date_default_timezone_set ( 'America/Sao_Paulo' );
 	getOperadorasBoleto($_SESSION["dados_acesso"][0]["CODIGO"]);
 	getFormasPagamento();
@@ -16,12 +19,12 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-		<script src="../resources/bootstrap/js/bootstrap.min.js"></script>
-		<script src="../resources/js/moment.js"></script>
-		<script src="../resources/controles.js"></script>
+		<script src="<?= BaseProjeto ?>/resources/bootstrap/js/bootstrap.min.js"></script>
+		<script src="<?= BaseProjeto ?>/resources/js/moment.js"></script>
+		<script src="<?= BaseProjeto ?>/resources/controles.js"></script>
 	
-		<link href="../resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="../resources/css/style.css" rel="stylesheet" type="text/css">
+		<link href="<?= BaseProjeto ?>/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="<?= BaseProjeto ?>/resources/css/style.css" rel="stylesheet" type="text/css">
 	
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet"
@@ -32,15 +35,15 @@
 			src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
 	
 		<!-- DATEPICKER -->
-		<script src="../resources/js/datepicker/js/bootstrap-datepicker.js"></script>
+		<script src="<?= BaseProjeto ?>/resources/js/datepicker/js/bootstrap-datepicker.js"></script>
 		<script
-			src="../resources/js/datepicker/locales/bootstrap-datepicker.pt-BR.min.js"></script>
+			src="<?= BaseProjeto ?>/resources/js/datepicker/locales/bootstrap-datepicker.pt-BR.min.js"></script>
 			
-		<link href="../resources/js/datepicker/css/bootstrap-datepicker.css"
+		<link href="<?= BaseProjeto ?>/resources/js/datepicker/css/bootstrap-datepicker.css"
 			rel="stylesheet" type="text/css">
 			
-		<script src="../resources/js/jquery-maskinput-1.1.4.js" defer></script>
-		<script src="../resources/js/jquery.maskMoney.min.js" defer></script>
+		<script src="<?= BaseProjeto ?>/resources/js/jquery-maskinput-1.1.4.js" defer></script>
+		<script src="<?= BaseProjeto ?>/resources/js/jquery.maskMoney.min.js" defer></script>
 		
 		
 			

@@ -94,8 +94,8 @@ class TransacaoService {
 		if ($dataReferencia) $dataReferencia = date ("Y-m-d", strtotime($dataReferencia));
 		try {
 			if ($idRemessa == 0){
-				$sql = "INSERT INTO remessas (
-							data_remessa, data_arquivo, sequencial_remessa, nome_arquivo, fk_operadora_empresa
+				$sql = "INSERT INTO arquivos (
+							data_banco, data_entrada, sequencial, nome_arquivo, fk_operadora_empresa
 						)VALUES ( 
 							DATE '" . $dataReferencia . "', 
 							DATE '" . $dataFormatada . "', " .
@@ -116,19 +116,19 @@ class TransacaoService {
 							}elseif ($lstT [$key] ["fk_status"] == 12){
 								$lstT [$key] ["novo_status"] = 5;
 							}
-							$sql = "INSERT INTO movimentacao (fk_transacao, fk_remessa, fk_status)
+							$sql = "INSERT INTO movimentacao (fk_transacao, fk_arquivo, fk_status)
 									VALUES (".$lstT [$key] ["id_transacao"].", $id, " . $lstT [$key] ["novo_status"] . ")";
 							$result = $this->banco->getConexaoBanco ()->query ( $sql );
 							
 							
 							$sql = "UPDATE movimentacao SET 
-									movimentacao.fk_remessa = $id WHERE movimentacao.id_movimentacao = " . $lstT [$key] ["id_movimentacao"];
+									movimentacao.fk_arquivo = $id WHERE movimentacao.id_movimentacao = " . $lstT [$key] ["id_movimentacao"];
 							$result = $this->banco->getConexaoBanco ()->query ( $sql );
 						}
 					
 // 						$dataFormatada = date ( 'Y-m-d', strtotime ( $dataArquivo ) );
 // 						foreach ( $lstT as $key => $value ) {
-// 							$sql = "UPDATE transacao SET " . "transacao.sequencial_remessa = " . $sequencial . "," . "transacao.data_arquivo = '" . $dataFormatada . "'," . "transacao.nome_arquivo = '" . $nomeArquivo . "' " . "WHERE transacao.id_transacao = " . $lstT [$key] ["id_transacao"];
+// 							$sql = "UPDATE transacao SET " . "transacao.sequencial = " . $sequencial . "," . "transacao.data_arquivo = '" . $dataFormatada . "'," . "transacao.nome_arquivo = '" . $nomeArquivo . "' " . "WHERE transacao.id_transacao = " . $lstT [$key] ["id_transacao"];
 // 							$result = $this->banco->getConexaoBanco ()->query ( $sql );
 // 						}
 						return array (
@@ -144,7 +144,7 @@ class TransacaoService {
 						);
 					}
 			}else{
-				$sql = "UPDATE remessas set remessas.data_arquivo = '" . $dataFormatada . "' WHERE remessas.id_remessa = $idRemessa";
+				$sql = "UPDATE arquivos set arquivos.data_entrada = '" . $dataFormatada . "' WHERE arquivos.id_arquivo = $idRemessa";
 				$this->banco->getConexaoBanco ()->query ( $sql );
 // 				if ($this->banco->getConexaoBanco ()->query ( $sql )) {
 // 					print_r($lstT);
@@ -175,7 +175,7 @@ class TransacaoService {
 						
 // 					$dataFormatada = date ( 'Y-m-d', strtotime ( $dataArquivo ) );
 // 					foreach ( $lstT as $key => $value ) {
-// 						$sql = "UPDATE transacao SET " . "transacao.sequencial_remessa = " . $sequencial . "," . "transacao.data_arquivo = '" . $dataFormatada . "'," . "transacao.nome_arquivo = '" . $nomeArquivo . "' " . "WHERE transacao.id_transacao = " . $lstT [$key] ["id_transacao"];
+// 						$sql = "UPDATE transacao SET " . "transacao.sequencial = " . $sequencial . "," . "transacao.data_arquivo = '" . $dataFormatada . "'," . "transacao.nome_arquivo = '" . $nomeArquivo . "' " . "WHERE transacao.id_transacao = " . $lstT [$key] ["id_transacao"];
 // 						$result = $this->banco->getConexaoBanco ()->query ( $sql );
 // 					}
 					return array (
@@ -234,7 +234,7 @@ class TransacaoService {
 		$previous = false;
 		
 		$sql = "SELECT  transacao.*, operadoras.nome_operadora, operadoras.codigo_banco, 
-						forma_pagamento.*, operadora_empresa.*, empresa.NOME, empresa.CNPJ, movimentacao.*, remessas.*   
+						forma_pagamento.*, operadora_empresa.*, empresa.NOME, empresa.CNPJ, movimentacao.*, arquivos.*   
 							FROM TRANSACAO 
 						LEFT OUTER JOIN forma_pagamento_operadora_empresa ON transacao.fk_forma_pagamento_operadora_empresa = forma_pagamento_operadora_empresa.id_forma_pagamento_operadora_empresa
 						INNER JOIN operadora_empresa ON forma_pagamento_operadora_empresa.fk_operadora_empresa = operadora_empresa.id_operadora_empresa
@@ -243,7 +243,7 @@ class TransacaoService {
 						INNER JOIN forma_pagamento ON forma_pagamento_operadora_empresa.fk_forma_pagamento = forma_pagamento.id_forma_pagamento 
 						
 						INNER JOIN movimentacao ON movimentacao.fk_transacao = transacao.id_transacao 
-						LEFT JOIN remessas ON movimentacao.fk_remessa = remessas.id_remessa ";
+						LEFT JOIN arquivos ON movimentacao.fk_arquivo = arquivos.id_arquivo ";
 // 							AND movimentacao.id_movimentacao = ( 
 // 							SELECT movimentacao.id_movimentacao FROM movimentacao
 // 								WHERE movimentacao.fk_transacao = transacao.id_transacao ORDER BY movimentacao.id_movimentacao DESC LIMIT 1 
@@ -270,7 +270,7 @@ class TransacaoService {
 				else
 					$sql .= " WHERE ";
 				$previous = true;
-				$wheredataPeriodo = "(movimentacao.data_remessa = '" . $dataI . "' AND '" . $dataF . "')";
+				$wheredataPeriodo = "(movimentacao.data_movimentacao = '" . $dataI . "' AND '" . $dataF . "')";
 				$sql .= $wheredataPeriodo;
 			}
 		}else{
@@ -279,7 +279,7 @@ class TransacaoService {
 			else
 				$sql .= " WHERE ";
 				$previous = true;
-				$wheredataPeriodo = "(movimentacao.fk_remessa = " . $remessa["id_remessa"] . ")";
+				$wheredataPeriodo = "(movimentacao.fk_arquivo = " . $remessa["id_arquivo"] . ")";
 				$sql .= $wheredataPeriodo;
 		}
 		
@@ -327,10 +327,10 @@ class TransacaoService {
 	}
 	
 	private function verificarSeJaExisteRemessa($dataI, $dataF, $banco, $empresa ){
-		$sql = "SELECT remessas.* FROM remessas
-					INNER JOIN operadora_empresa ON remessas.fk_operadora_empresa = operadora_empresa.id_operadora_empresa
+		$sql = "SELECT arquivos.* FROM arquivos
+					INNER JOIN operadora_empresa ON arquivos.fk_operadora_empresa = operadora_empresa.id_operadora_empresa
 					INNER JOIN empresa ON operadora_empresa.fk_empresa = empresa.CODIGO
-					WHERE (remessas.data_remessa BETWEEN '$dataI' AND '$dataF') AND empresa.CODIGO = $empresa";
+					WHERE (arquivos.data_banco BETWEEN '$dataI' AND '$dataF') AND empresa.CODIGO = $empresa";
 // 		echo  "--- $sql ---";
 		$consulta = $this->banco->getConexaoBanco ()->query ( $sql );
 		$lstRemessas = array ();
@@ -687,7 +687,6 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 			}
 			$lstTransacoes = array_values($lstTransacoes);
 			
-// 			print_r($lstTransacoes);
 			if (count ( $lstTransacoes ) > 0) {
 				//REMONTA REMESSA
 				$this->remontarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa , $remessa);
@@ -701,6 +700,7 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		}else{
 			if (count ( $lstTransacoes ) > 0) {
 				
+				//remover transações que iriam para a remessa mas foram canceladas antes de gerar o arquivo
 				foreach ( $lstTransacoes as $chave => $value ) {
 					$sql = "SELECT movimentacao.* FROM movimentacao
 								WHERE movimentacao.fk_transacao = " . $lstTransacoes[$chave]["id_transacao"] . " AND movimentacao.fk_status = 4";
@@ -724,45 +724,6 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 				break;
 			}else return null;
 		}
-		
-		
-		// print_r($lstTransacoes);
-// 		$retorno = array ();
-// 		if (count ( $lstTransacoes ) > 0) {
-// 			foreach ( $lstTransacoes as $chave => $value ) {
-// 				if (!$lstTransacoes [$chave] ["fk_remessa"]){
-// 					$sequencial = $this->getSequencial ( $lstTransacoes [0] ["id_operadora_empresa"] );
-// 					$lstTransacoes [$chave] ["num_sequencial_remessa"] = $sequencial ["num_sequencial_remessa"];
-// 				}else{
-// 					$this->remontarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa , $lstTransacoes[$chave]["fk_remessa"]);
-// 					array_push ( $retorno, 3 );
-// 					array_push ( $retorno, $lstTransacoes [0] ["nome_arquivo"] );
-// 					array_push ( $retorno, $empresa );
-// 					return $retorno;
-// 					break;
-// 				}
-				
-// 				if ($lstTransacoes [$chave] ["sequencial_remessa"] == "" || $lstTransacoes [$chave] ["sequencial_remessa"] == null) {
-// 					$sequencial = $this->getSequencial ( $lstTransacoes [0] ["id_operadora_empresa"] );
-// 					$lstTransacoes [$chave] ["num_sequencial_remessa"] = $sequencial ["num_sequencial_remessa"];
-// 				} else {
-// 					$this->remontarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa );
-// 					array_push ( $retorno, 3 );
-// 					array_push ( $retorno, $lstTransacoes [0] ["nome_arquivo"] );
-// 					array_push ( $retorno, $empresa );
-// 					return $retorno;
-// 					break;
-// 				}
-				
-				
-// 			}
-// 			$nomeArquivo = $this->gerarRemessaBancodoBrasil400 ( $lstTransacoes, $empresa );
-// 			array_push ( $retorno, 1 );
-// 			array_push ( $retorno, $nomeArquivo );
-// 			array_push ( $retorno, $empresa );
-// 			return $retorno;
-// 		} else
-// 			return null;
 	}
 	
 	public function montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual, $empresa, $sequencialR ){
@@ -1018,12 +979,12 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		$fp = fopen ( $empresa."/".$nome, "w" );
 		
 		$dataAtual = date ( 'dmy' );
-		$escreve = fwrite ( $fp, $this->montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual, $empresa, $remessa["sequencial_remessa"] ) );
+		$escreve = fwrite ( $fp, $this->montarRemessaBancodoBrasil400($lstTransacoes, $dataAtual, $empresa, $remessa["sequencial"] ) );
 		// Fecha o arquivo
 		fclose ( $fp );
 		
 // 		$this->updateSequencial ( $lstTransacoes [0] ["num_sequencial_remessa"], $lstTransacoes [0] ["id_operadora_empresa"] );
-		$retorno = $this->updateTransacaoRemessa ( $lstTransacoes, $dataAtual, $nome, $remessa["sequencial_remessa"] , $lstTransacoes [0] ["id_operadora_empresa"], $remessa ["id_remessa"], null);
+		$retorno = $this->updateTransacaoRemessa ( $lstTransacoes, $dataAtual, $nome, $remessa["sequencial"] , $lstTransacoes [0] ["id_operadora_empresa"], $remessa ["id_arquivo"], null);
 		if ($retorno["CodStatus"] == 1)
 			return $nome;
 		return $retorno["Msg"];
@@ -1121,7 +1082,7 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 				$id = $this->banco->getConexaoBanco ()->insert_id;
 				
 				$sql = 	"INSERT INTO movimentacao (
-							fk_transacao, fk_status, data_remessa)
+							fk_transacao, fk_status, data_movimentacao)
 						VALUES ($id, 8, DATE '" . $dados ['dataDocumento'] . "')";
 				$this->banco->getConexaoBanco ()->query ( $sql );
 				return array (
@@ -1510,7 +1471,7 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 	
 	public function updateStatusTransaction($idT, $newS, $fkRemessa){
 		$dataRemessa = new DateTime();
-		$sql = "INSERT INTO movimentacao (fk_transacao, fk_status, fk_remessa, data_movimentacao) VALUES ($idT, $newS, $fkRemessa, DATE '" . $dataRemessa->format ( 'Y-m-d' ) . "')";
+		$sql = "INSERT INTO movimentacao (fk_transacao, fk_status, fk_arquivo, data_movimentacao) VALUES ($idT, $newS, $fkRemessa, DATE '" . $dataRemessa->format ( 'Y-m-d' ) . "')";
 		$result = $this->banco->getConexaoBanco ()->query ( $sql );
 		
 		$sql = "UPDATE transacao 
@@ -1524,12 +1485,12 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		$result = $this->banco->getConexaoBanco ()->query ( $sql );
 	}
 	
-	public function updateStatusTransactionReturn($transacao, $newS){
+	public function updateStatusTransactionReturn($transacao, $newS, $fkArquivo){
 		$dataEntrada = new DateTime();
 		$dataProcessamento = new DateTime( date("d/m/Y", strtotime($transacao["data_processamento"])) );
-		$sql = "INSERT INTO movimentacao (fk_transacao, fk_status, fk_remessa, data_movimentacao, data_processamento_operadora) VALUES (" . 
+		$sql = "INSERT INTO movimentacao (fk_transacao, fk_status, fk_arquivo, data_movimentacao, data_processamento_operadora) VALUES (" . 
 					$transacao["id_transacao"] . 
-					", $newS, null, DATE '" . 
+					", $newS, $fkArquivo, DATE '" . 
 					$dataEntrada->format ( 'Y-m-d' ) . 
 					"', DATE '" . $dataProcessamento->format ( 'Y-m-d' ) . "')";
 		$result = $this->banco->getConexaoBanco ()->query ( $sql );
@@ -1545,13 +1506,13 @@ $this->zerosEsquerda ( ($_i + 1), 6 ); // NÚMERO SEQUENCIAL DO REGISTRO - TAMAN
 		$result = $this->banco->getConexaoBanco ()->query ( $sql );
 	}
 	
-	public function updateStatusTransactionPaymentReturn($transacao, $newS){
+	public function updateStatusTransactionPaymentReturn($transacao, $newS, $fkArquivo){
 		$dataEntrada = new DateTime();
 		$dataProcessamento = new DateTime( date("d/m/Y", strtotime($transacao["data_processamento"])) );
 		$dataPagamento = new DateTime( date("d/m/Y", strtotime($transacao["data_pagamento"])));
-		$sql = "INSERT INTO movimentacao (fk_transacao, fk_status, fk_remessa, data_movimentacao, data_processamento_operadora) VALUES (" . 
+		$sql = "INSERT INTO movimentacao (fk_transacao, fk_status, fk_arquivo, data_movimentacao, data_processamento_operadora) VALUES (" . 
 					$transacao["id_transacao"] . 
-					", $newS, null, DATE '" . 
+					", $newS, $fkArquivo, DATE '" . 
 					$dataEntrada->format ( 'Y-m-d' ) . 
 					"', DATE '" . $dataProcessamento->format ( 'Y-m-d' ) . "')";
 		$result = $this->banco->getConexaoBanco ()->query ( $sql );

@@ -8,16 +8,16 @@
 				Opções <span class="caret"></span>
 			</button>
 			<ul class="dropdown-menu">
-				<li><a href="home.php">Pagamentos pendentes</a></li>
-				<li><a href="consultas.php">Buscas e totalizadores</a></li>
+				<li><a href="pagamentos-pendentes">Pagamentos pendentes</a></li>
+				<li><a href="buscas-pagamentos">Buscas e totalizadores</a></li>
 				
 				<li role="separator" class="divider"></li>
-				<li><a href="formtransacao.php">Gerar Boleto</a></li>
+				<li><a href="novo-boleto">Gerar Boleto</a></li>
 				<li><a href="#modalRemessa" data-toggle="modal" data-target="#modalRemessa">Gerar remessa</a></li>
 				<li><a href="#modalRetorno" data-toggle="modal" data-target="#modalRetorno">Processar retorno</a></li>
 				<li role="separator" class="divider"></li>
-				<li><a href="../../views/home.php">Sistemas</a></li>
-				<li><a href="../../views/logout.php">Logout</a></li>
+				<li><a href="../sistemas/">Sistemas</a></li>
+				<li><a href="../logout/">Logout</a></li>
 			</ul>
 		</div>
 	</div>

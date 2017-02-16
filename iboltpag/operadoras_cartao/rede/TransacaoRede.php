@@ -1,5 +1,4 @@
-<?php
-@include("configuracoes/constantesRedeCar.php");
+<?phpoperadoras_cartao("configuracoes/constantesRedeCar.php");
 class TransacaoRedeCar{
 	
 	private $url_ws = "";

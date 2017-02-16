@@ -31,3 +31,7 @@ border-radius: 5px;
     font-size: xx-large;
     font-weight: bold;
 }
+
+.info-logon{
+	float: right;
+}

@@ -1,6 +1,7 @@
 <?php
 require_once '../services/TransacaoService.php';
 require_once '../services/EmpresaService.php';
+require_once '../services/ArquivosService.php';
 include '../util/funcoes.php';
 
 session_start ();
@@ -17,25 +18,35 @@ if (isset($_POST["servico"])){
 
 
 function processarRetorno(){
+	$retorno = array();
 	$registro = json_decode($_POST["lstTransacoes"], true);
-	print_r($_POST["lstTransacoes"]);
-	$ts = new TransacaoService();
 	
-	foreach($registro as $chave => $value){
-		if ($registro[$chave]["comando"] == "02"){//Confirmada entrada de título
-			$ts->updateStatusTransactionReturn($registro[$chave], 2);
-			unset($registro[$chave]);
+	$as = new ArquivosService();
+	$lstArquivos = $as->getArquivosRetornoBySequencial($registro["sequencial_retorno"], $registro["operadora_empresa"]["id_operadora_empresa"]);
+	
+	if (count($lstArquivos) > 0){
+		array_push ( $retorno, 2 );
+		array_push ( $retorno, $lstArquivos [0] ["nome_arquivo"] );
+		echo json_encode($retorno);
+		return;
+	}
+	$idArquivos = $as->insertArquivoRetorno($registro["sequencial_retorno"], $registro["data_processamento"], $registro["operadora_empresa"]["id_operadora_empresa"]);
+	$ts = new TransacaoService();
+	foreach($registro["transacoes"] as $chave => $value){
+		if ($registro["transacoes"][$chave]["comando"] == "02"){//Confirmada entrada de título
+			$ts->updateStatusTransactionReturn($registro["transacoes"][$chave], 2, $idArquivos);
+			unset($registro["transacoes"][$chave]);
 		}
 	}
 	
-	foreach($registro as $chave => $value){	
-		switch ($registro[$chave]["comando"]){
+	foreach($registro["transacoes"] as $chave => $value){	
+		switch ($registro["transacoes"][$chave]["comando"]){
 			case "03":
 				break;
 			case "05":
 				break;
 			case "06"://Liquidação normal
-				$ts->updateStatusTransactionPaymentReturn($registro[$chave], 9);
+				$ts->updateStatusTransactionPaymentReturn($registro["transacoes"][$chave], 9, $idArquivos);
 				break;
 			case "07":
 				break;
@@ -44,7 +55,7 @@ function processarRetorno(){
 			case "09":
 				break;
 			case "10"://Baixa solicitada
-				$ts->updateStatusTransactionReturn($registro[$chave], 4);
+				$ts->updateStatusTransactionReturn($registro["transacoes"][$chave], 4, $idArquivos);
 				break;
 			case "11":
 				break;
@@ -55,7 +66,7 @@ function processarRetorno(){
 			case "14":
 				break;
 			case "15"://liquidação em cartório
-				$ts->liquidarPagamento($_SESSION["dados_acesso"][0]["CODIGO"], $registro[$chave]["origem"], $registro[$chave]["fk_pagamento"], $registro[$chave]["data_pagamento"], $array[$chave]["valor_pago"], 10);
+// 				$ts->liquidarPagamento($_SESSION["dados_acesso"][0]["CODIGO"], $registro[$chave]["origem"], $registro[$chave]["fk_pagamento"], $registro[$chave]["data_pagamento"], $array[$chave]["valor_pago"], 10);
 				break;
 			case "16":
 				break;
@@ -68,7 +79,7 @@ function processarRetorno(){
 			case "22":
 				break;
 			case "23"://Indicação de encaminhamento a cartório
-				$ts->updateStatusTransactionReturn($_SESSION["dados_acesso"][0]["CODIGO"], $registro[$chave]["origem"], $registro[$chave]["fk_pagamento"], 6);
+// 				$ts->updateStatusTransactionReturn($_SESSION["dados_acesso"][0]["CODIGO"], $registro[$chave]["origem"], $registro[$chave]["fk_pagamento"], 6);
 				break;
 			case "24":
 				break;
@@ -116,6 +127,11 @@ function processarRetorno(){
 				break;
 		}
 	}
+	
+	array_push ( $retorno, 1 );
+	array_push ( $retorno, "Success" );
+	echo json_encode($retorno);
+	return;
 }
 
 function carregarRetorno(){
@@ -126,6 +142,8 @@ function carregarRetorno(){
 		$listRetorno = array();
 		rewind ( $arquivoRetorno );
 		$arquivoRetorno = fopen ( $_FILES ["arquivo"] ["tmp_name"], "r" );
+		$arquivo = array();
+		$arquivo["transacoes"] = array();
 		while ( ! feof ( $arquivoRetorno ) ) {
 			$linha = fgets ( $arquivoRetorno );
 			$tipoRegistro = substr ( $linha, 0, 1 );
@@ -140,10 +158,14 @@ function carregarRetorno(){
 				$data_arquivo_retorno = substr ( $linha, 94, 6 );
 				$sequencial_retorno = substr ( $linha, 100, 7 );
 				$num_convenio = substr ( $linha, 149, 7 );
-				if (!validarInformacoes($agencia, $dg_agencia, $conta_corrente, $dg_conta_corrente)){
+				if (!$operadora_empresa = validarInformacoes($agencia, $dg_agencia, $conta_corrente, $dg_conta_corrente)){
 					echo "ARQUIVO NÃO RECONHECIDO PARA A CONTA CADASTRADA DESTA EMPRESA PARA O BANCO DO BRASIL";
 					break;
 				}
+				$arquivo["operadora_empresa"] = $operadora_empresa;
+				$arquivo["sequencial_retorno"] = intval($sequencial_retorno);
+				$dataProcessamento = DateTime::createFromFormat('dmy', $data_arquivo_retorno);
+				$arquivo["data_processamento"] = $dataProcessamento->format("d/m/Y");
 			} elseif ($tipoRegistro == "7") {
 				$ts = new TransacaoService();
 				$nosso_numero = substr($linha, 70, 10);
@@ -160,6 +182,8 @@ function carregarRetorno(){
 				$data_pagamento = DateTime::createFromFormat('dmy', substr($linha, 110, 6));
 				$valor_pago = ltrim(substr($linha, 253, 13), '0');
 				$valor_pago = ($valor_pago/100);
+				$taxa_banco = ltrim(substr($linha, 181, 7), '0');
+				$taxa_banco = ($taxa_banco/100);
 				$data_credito = DateTime::createFromFormat('dmy', substr($linha, 175, 6));
 					
 				$transacao = $ts->getTransacaoByNossoNumero($_SESSION["dados_acesso"][0]["CODIGO"], $origem, $fk_pagamento);
@@ -171,11 +195,9 @@ function carregarRetorno(){
 					$transacao["data_pagamento"] = $data_pagamento->format("d/m/Y");
 							
 				if (substr($linha, 175, 6) != "000000")
-					$transacao["data_credito"] = $data_vencimento->format("d/m/Y");
+					$transacao["data_credito"] = $data_credito->format("d/m/Y");
 				
-				$dataProcessamento = DateTime::createFromFormat('dmy', $data_arquivo_retorno);
-				$transacao["data_processamento"] = $dataProcessamento->format("d/m/Y");
-					
+				
 				$transacao["nosso_numero"] = $nosso_numero;
 				$transacao["origem"] = $origem;
 				$transacao["fk_pagamento"] = $fk_pagamento;
@@ -184,49 +206,25 @@ function carregarRetorno(){
 				$transacao["comando"] = $comando;
 				$transacao["descricao_comando"] = comandoRetorno($comando);
 				$transacao["id_transacao"] = intval($id_transacao);
-				array_push($listRetorno, $transacao);
-								
-								
-							// 			if ($comando == "03"){
-							//O REGISTRO FOI RECUSADO
-							// 				print_r(array("CodStatus" => 2, "Msg" => "Registro $nosso_numero foi recusado. Motivo: $nat_recebimento", "Model" => $linha));
-							// 			}else{
-	
-							// 				switch ($comando){
-							// 					case "05" || "06" || "07" || "08" || "15": //LIQUIDAÇÃO
-							// 						$transacao["pago"] = true;
-							// 						$data_pagamento = substr($linha, 110, 6);
-							// 						$valor_pagamento = substr($linha, 253, 13);
-	
-	
-							// 						echo "DT: $data_pagamento\n\n";
-	
-							// 						$ts = new TransacaoService();
-							// 						$ts->liquidarPagamento($_SESSION["dados_acesso"][0]["CODIGO"], $origem, $fk_pagamento, $data_pagamento, $valor_pagamento);
-							// 						break;
-							// 				}
-							// 			}
-							// 			echo "\nNN: $nosso_numero";
-							// 			echo "\nOR: $origem";
-							// 			echo "\nPG: $fk_pagamento";
-							// 			echo "\nCM: $comando";
-							// 			echo "\nNR: $nat_recebimento\n";
-								
-							// 			echo "\npercorrendo detalhe registro...\n";
+				$transacao["data_processamento"] = $arquivo["data_processamento"];
+				$transacao["taxa"] = $taxa_banco;
+				array_push($arquivo["transacoes"], $transacao);
+// 				array_push($listRetorno, $transacao);
+				
 			} elseif ($tipoRegistro == "9") {
 				// 			echo "\npercorrendo trailler...\n";
 			}
 		}
-		echo (json_encode($listRetorno));
+		echo (json_encode($arquivo));
 	}
 	fclose ( $arquivoRetorno );
 }
 
 function validarInformacoes($agencia, $dg_agencia, $conta_corrente, $dg_conta_corrente) {
 	$es = new EmpresaService ();
-	
+	$infoRetorno = array();
 	$infoRetorno = $es->getOperadoraEmpresa($_SESSION["dados_acesso"][0]["CODIGO"], $agencia, $dg_agencia, $conta_corrente, $dg_conta_corrente);
-	if ($infoRetorno == 1) return true;
+	if (count($infoRetorno) == 1) return $infoRetorno[0];
 	else return false;
 }
 function validarSintaxeArquivo($arquivoRetorno) {

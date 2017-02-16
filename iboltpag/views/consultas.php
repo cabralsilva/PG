@@ -2,6 +2,11 @@
 	require_once '../util/constantes.php';
 	include '../controllers/consultasController.php';
 	$cc = new ConsultasController();
+	
+	if (!isset($_SESSION["usuario_logado"])){
+		$_SESSION["falha_login"] = "Autenticação necessária";
+		header("location: " . BaseProjeto . "/../");
+	}
 	//$hc->buscarPagamentosPendentes();
 	$cc->buscarOperadorasBoleto();
 	$cc->buscarStatus();
@@ -13,16 +18,16 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<HTTP-EQUIV ="PRAGMA" CONTENT="NO-CACHE"> 
-	<link href="../resources/css/style.css" rel="stylesheet" type="text/css">
+	<link href="<?= BaseProjeto ?>/resources/css/style.css" rel="stylesheet" type="text/css">
 	
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<script src="../resources/bootstrap/js/jquery3.3.1.min.js"></script>
-	<script src="../resources/bootstrap/js/bootstrap3.3.7.min.js"></script>
+	<script src="<?= BaseProjeto ?>/resources/bootstrap/js/jquery3.3.1.min.js"></script>
+	<script src="<?= BaseProjeto ?>/resources/bootstrap/js/bootstrap3.3.7.min.js"></script>
 	
 	<!-- DATEPICKER -->
-	<script src="../resources/datepicker-default/js/bootstrap-datepicker.js"></script>
-	<script src="../resources/datepicker-default/locales/bootstrap-datepicker.pt-BR.min.js"></script>
-	<link href="../resources/datepicker-default/css/bootstrap-datepicker.css" rel="stylesheet" type="text/css">
+	<script src="<?= BaseProjeto ?>/resources/datepicker-default/js/bootstrap-datepicker.js"></script>
+	<script src="<?= BaseProjeto ?>/resources/datepicker-default/locales/bootstrap-datepicker.pt-BR.min.js"></script>
+	<link href="<?= BaseProjeto ?>/resources/datepicker-default/css/bootstrap-datepicker.css" rel="stylesheet" type="text/css">
 	
 	<!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
@@ -31,7 +36,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
 	
 	<!-- defaults -->
-	<script src="../resources/default-js.js"></script>
+	<script src="<?= BaseProjeto ?>/resources/default-js.js"></script>
 </head>
 <body>
 	<br>

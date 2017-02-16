@@ -4,7 +4,7 @@
 	
 	if (!isset($_SESSION["usuario_logado"])){
 		$_SESSION["falha_login"] = "Autenticação necessária";
-		header("location: login.php");
+		header("location: login");
 	}
 ?>
 <!DOCTYPE html>
@@ -17,13 +17,15 @@
 <link rel="stylesheet" href="<?= BaseProjeto ?>/resources/bootstrap/css/bootstrap.min.css">
 </head>
 <body>
+	
 	<div class="container">
+		<span class="info-logon">Usuário <?= $_SESSION["usuario_logado"]["nome_usuario"] ?> - <a href="../logout/">Logout</a></span>
 		<div class="row lst-sistemas">
 			<?php foreach($_SESSION["dados_acesso"] as $modulo){ ?>
 				<div class="col-md-6">
 					<div class="box-central">
 			            <div class="espaco-sistema">	
-			            	<a href="../<?= $modulo['diretorio_sistema']; ?>/views/home.php">
+			            	<a href="../<?= $modulo['diretorio_sistema']; ?>/">
 			            		<img alt="" src="../<?= $modulo['diretorio_logo']; ?>">
 								<span class="descricao-sistema"><?=  $modulo['descricao_sistema']; ?></span>
 							</a>

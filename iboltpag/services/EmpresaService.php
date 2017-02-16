@@ -17,14 +17,14 @@ class EmpresaService {
 				operadora_empresa.numero_conta = $conta_corrente AND operadora_empresa.digito_conta = $dg_conta_corrente";
 // 		echo "\n$sql\n";
 		$consulta = $this->banco->getConexaoBanco ()->query ( $sql );
-// 		$lstOE = array ();
-// 		while ( $linha = $consulta->fetch_array ( MYSQLI_ASSOC ) ) {
-// 			array_push ( $lstOE, $linha );
-// 		}
-		$total = $consulta->num_rows;
+		$lstOE = array ();
+		while ( $linha = $consulta->fetch_array ( MYSQLI_ASSOC ) ) {
+			array_push ( $lstOE, $linha );
+		}
+// 		$total = $consulta->num_rows;
 		$consulta->close ();
-// 		return $lstOE[0];
-		return $total;
+		return $lstOE;
+// 		return $total;
 	}
 }
 	

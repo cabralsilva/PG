@@ -1,5 +1,4 @@
-<?php
-@include("configuracoes/constantesCielo.php");
+<?phpoperadoras_cartao("configuracoes/constantesCielo.php");
 class TransacaoCielo {
 	
 	/*CONSTRUCTER*/

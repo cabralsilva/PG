@@ -1,0 +1,13 @@
+Options -Indexes
+DirectoryIndex views/home.php
+
+RewriteEngine on
+	RewriteRule ^views/?$ views/home.php [NC]
+	RewriteRule ^controllers/?$ views/home.php [NC]
+	RewriteRule ^services/?$ views/home.php [NC]
+	RewriteRule ^models/?$ views/home.php [NC]
+	RewriteRule ^resources/?$ views/home.php [NC]
+	RewriteRule ^util/?$ views/home.php [NC]
+	RewriteRule ^pagamentos-pendentes/?$ views/home.php [NC]
+	RewriteRule ^buscas-pagamentos/?$ views/consultas.php [NC]
+	RewriteRule ^novo-boleto/?$ views/formtransacao.php [NC]

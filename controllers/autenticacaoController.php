@@ -34,7 +34,7 @@
 			$_SESSION["dados_empresa"]["user_banco_empresa"] = $_SESSION["dados_acesso"][0]["USER_BANCO"];
 			$_SESSION["dados_empresa"]["senha_banco_empresa"] = $_SESSION["dados_acesso"][0]["SENHA_BANCO"];
 			
-			header("location: ../views/home.php");
+			header("location: ../sistemas/");
 		} catch (Exception $e) {
 			$_SESSION["falha_login"] = $e->getMessage(); 
 			header("location: " . $_SERVER["HTTP_REFERER"] );

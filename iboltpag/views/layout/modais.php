@@ -1,3 +1,16 @@
+<?php
+	include '../controllers/remessaController.php';
+	
+	$rc = new RemessaController();
+	$rc->buscarOperadorasBoleto ();
+?>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
 <!-- Modal Remessa-->
 <div class="modal fade" id="modalRemessa" tabindex="-1" role="dialog"
 	aria-labelledby="myModalLabel">
@@ -23,8 +36,17 @@
 						<label for="selecaoOperadoraRemessa">Banco</label> <select
 							class="form-control selectpicker" id="selecaoOperadoraRemessa"
 							title="Selecione..." data-width="100%">
+							
 								<?php foreach ($_REQUEST["lstOperadoras"] as $operadora){?>
-									<option value="<?= $operadora["id_operadora"]?>"><?= $operadora["nome_operadora"]?></option>
+									<optgroup label="<?= $operadora["nomeOperadora"]?>">
+										<?php foreach ($operadora["contas"] as $contas){?>
+											<option title="<?= $operadora["nomeOperadora"]?> - Ag: <?= $contas["agencia"]?> - CC:<?= $contas["conta"]?> - Cart: <?= $contas["carteira"]?>" value="<?= $contas["idOperadoraEmp"]?>">
+												Carteira: <?= $contas["carteira"]?> - Ag.: <?= $contas["agencia"]?> - Conta: <?= $contas["conta"]?>
+											</option>
+										<?php }?>
+										
+									</optgroup>
+									
 								<?php }?>
 							</select>
 					</div>
@@ -101,6 +123,61 @@
 	    autoclose: true
 	});
 
+	function gerarRemessa(baseProjeto) {
+		
+		var dataRemessa = document.getElementById('diaRemessa').value;
+		var operadoras = "";
+		$("#selecaoOperadoraRemessa option:selected").each(function(ind, elem) {
+			operadoras += elem.value;
+		});
+//		console.log(operadoras);
+		$.ajax({
+			async : true,
+			type : "POST",
+			url : baseProjeto + "/controllers/remessaController.php",
+			data : {
+				servico : "gerarRemessaDia",
+				dataRemessa : dataRemessa,
+				banco : operadoras
+			},
+			success : function(e) {
+				console.log(e);
+// 				if (e !== 'null') {
+// 					var obj = JSON.parse(e);
+// 					console.log(obj);
+// 					switch (obj[0]) {
+// 						case 0:
+// 							break;
+// 						case 1:
+// 							var link = document.createElement('a');
+// 	        				link.href = baseProjeto + "/controllers/"+obj[2]+"/"+obj[1];
+// 	        				link.download = obj[1];
+// 	        				document.body.appendChild(link);
+// 	        				link.click();
+// 							break;
+// 						case 2:
+// 							alert("Selecione boletos somente de um banco!");
+// 							break;
+// 						case 3:
+// 							alert("Um arquivo remessa já foi gerado nesta data. O mesmo arquivo será gerado novamente!");
+// 							var link = document.createElement('a');
+// 							link.href = baseProjeto + "/controllers/"+obj[2]+"/"+obj[1];
+// 							link.download = obj[1];
+// 							document.body.appendChild(link);
+// 							link.click();
+// 							break;
+// 						default:
+// 							break;
+// 					}
+// 				} else
+// 					alert("Nenhum boleto encontrado nesta data");
+			},
+			error : function(error) {
+				// console.log(eval(error));
+			}
+		});
+	}
+
 	function carregarRetorno(){
 		if ($('#arquivo').val() != "")
 			$("#formulario").submit();
@@ -109,7 +186,6 @@
 	}
 
 	function processarRetorno(){
-// 		console.log(JSON.stringify(listaRegistros));
 		$.ajax({
 	    	url : "<?= BaseProjeto ?>/controllers/retornoController.php",
 	        type: 'POST',

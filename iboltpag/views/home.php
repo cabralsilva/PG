@@ -11,7 +11,7 @@ if (!isset($_SESSION["usuario_logado"])){
 }
 
 $hc->buscarPagamentosPendentes ();
-$hc->buscarOperadorasBoleto ();
+// $hc->buscarOperadorasBoleto ();
 date_default_timezone_set ( 'America/Sao_Paulo' );
 
 // print_r($hc->getListPagamentosPendentes()[0]);
@@ -53,9 +53,6 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 					<div>
 						<ul class="nav nav-tabs" role="tablist">
 							<li role="presentation" class="active"><a class="tab-principal"
-								href="#tab-todos" aria-controls="tab-todos" role="tab"
-								data-toggle="tab">Todos</a></li>
-							<li role="presentation"><a class="tab-principal"
 								href="#tab-boletos" aria-controls="tab-boletos" role="tab"
 								data-toggle="tab">Boleto</a></li>
 							<li role="presentation"><a class="tab-principal"
@@ -64,137 +61,7 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 						</ul>
 						<!-- Tab panes PRINCIPAIS-->
 						<div class="tab-content">
-							<div role="tabpanel" class="tab-pane active" id="tab-todos">
-								<br>
-								<div id="tableTransacoes">
-									<table id="transacoes" class="table table-hover table-striped ">
-										<thead>
-											<tr>
-												<th class="col-md-1"><center>ORIGEM</center></th>
-												<th class="col-md-1"><center>NOSSO NÚMERO</center></th>
-												<th class="col-md-1"><center>ENTRADA</center></th>
-												<th class="col-md-1"><center>VENCIMENTO</center></th>
-												<th class="col-md-1"><center>MOVIMENTAÇÃO</center></th>
-												<th class="col-md-1"><center>STATUS</center></th>
-												<th class="col-md-1"><center>FORMA PGTO.</center></th>
-												<th class="col-md-1 alignright">BRUTO</th>
-												<th class="col-md-1 alignright">LIQUIDO</th>
-												<th class="col-md-1"><center></center></th>
-												<th class="col-md-1"><center></center></th>
-											</tr>
-										</thead>
-										<tbody id="conteudo-relatorio">
-										
-										<?php foreach($hc->getListPagamentosPendentes() as $pagamento){?>
-										
-											<tr class='linha_relatorio'>
-												<td class="col-md-1 valign">
-													<center>
-													<?php
-														switch ($pagamento ["id_origem"]) {
-															case "0" :
-																echo "Avulso";
-																break;
-															case "1" :
-																echo "Pedido";
-																break;
-															case "2" :
-																echo "Faturamento";
-																break;
-															case "3" :
-																echo "Tipo 3";
-																break;
-															case "4" :
-																echo "Tipo 4";
-																break;
-															case "5" :
-																echo "Tipo 5";
-																break;
-															case "6" :
-																echo "Tipo 6";
-																break;
-															case "7" :
-																echo "Tipo 7";
-																break;
-															case "8" :
-																echo "Tipo 8";
-																break;
-															case "9" :
-																echo "Tipo 9";
-																break;
-															default :
-																echo "Não identificada";
-																break;
-														}
-														?>
-													</center>
-												</td>
-												<td class="col-md-1 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
-												<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_criacao_origem"])) ?></center></td>
-												<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_vencimento_boleto"]))?></center>
-												<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_movimentacao"])) ?></center></td>
-												</td>
-												<td class="col-md-1 valign">
-													<center><?= $pagamento["estado"] ?></center>
-												</td>
-												<td class="col-md-1 valign">
-													<center>
-													<?= $pagamento["descricao_forma_pagamento"]?>
-													</center>
-												</td>
-												<td class="col-md-1 valign" align='right'>R$ <?php echo number_format($pagamento['valor_transacao'], 2, ',', '.'); ?></td>
-												<td class="col-md-1 valign" align='right'>R$ <?php echo number_format($pagamento['valor_transacao'], 2, ',', '.'); ?></td>
-												<td class="col-md-1 valign" align='right'>
-													<button type="button"
-														class="btn btn-success dropdown-toggle"
-														data-toggle="dropdown"
-														data-idt="<?= $pagamento['id_transacao'] ?>"
-														onclick="imprimirBoleto(this)">Boleto</button>
-												</td>
-												<td class="col-md-1 valign alignright">
-													<center>
-														<a data-toggle="collapse"
-															href="#moreinfopagamentopendentes-<?= $pagamento["id_transacao"]?>"
-															aria-expanded="false" aria-controls="collapseExample"><span
-															id="iconmoreinfopendentes-<?= $pagamento["id_transacao"]?>"
-															class="iconmorefinfopendentes-<?= $pagamento["id_transacao"]?> glyphicon glyphicon-plus"
-															aria-hidden="true"></span></a>
-													</center>
-												</td>
-											</tr>
-											<tr class="success">
-												<td class="moredetailpayment" colspan="11">
-													<div
-														id="moreinfopagamentopendentes-<?= $pagamento["id_transacao"]?>"
-														data-idpagamento="<?= $pagamento["id_transacao"]?>"
-														class="collapse moreinfopagamentopendentes">
-														<table id="table5" class="table table-hover sucess">
-															<thead class="headhistorico">
-<!-- 																<tr class="success"> -->
-<!-- 																	<td class="col-md-4 "><center>NOSSO NÚMERO</center></td> -->
-<!-- 																	<td class="col-md-4 "><center>CLIENTE</center></td> -->
-<!-- 																	<td class="col-md-4 "><center>DATA CRIAÇÃO</center></td> -->
-<!-- 																</tr> -->
-															</thead>
-															<tbody>
-																<tr class="success">
-<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
-<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
-<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
-																</tr>
-															</tbody>
-														</table>
-													</div>
-												</td>
-											</tr>
-											
-										<?php }?>
-										<!-- <tr><td colspan='12' align='center'>Preencha os filtros!</td></tr> -->
-										</tbody>
-									</table>
-								</div>
-							</div>
-							<div role="tabpanel" class="tab-pane" id="tab-boletos">
+							<div role="tabpanel" class="tab-pane active" id="tab-boletos">
 								<br>
 								<!-- Nav tabs BOLETOS-->
 								<div>
@@ -218,123 +85,39 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 													<thead>
 														<tr>
 															<th class="col-md-1"><center>ORIGEM</center></th>
-															<th class="col-md-1"><center>NOSSO NÚMERO</center></th>
-															<th class="col-md-1"><center>ENTRADA</center></th>
+															<th class="col-md-1"><center>IDENTIFICADOR</center></th>
+															<th class="col-md-1"><center>CODIGO ORIGEM</center></th>
+															<th class="col-md-1"><center>CODIGO PAGAMENTO</center></th>
+															<th class="col-md-1"><center>DATA ORIGEM</center></th>
+															<th class="col-md-1"><center>DATA ENTRADA</center></th>
 															<th class="col-md-1"><center>VENCIMENTO</center></th>
-															<th class="col-md-1"><center>MOVIMENTAÇÃO</center></th>
 															<th class="col-md-1"><center>STATUS</center></th>
-															<th class="col-md-1"><center>FORMA PGTO.</center></th>
-															<th class="col-md-1 alignright">BRUTO</th>
-															<th class="col-md-1 alignright">LIQUIDO</th>
-															<th class="col-md-1"><center></center></th>
+															<th class="col-md-1"><center>DATA STATUS</center></th>
+															<th class="col-md-1"><center>FORMA PAGAMENTO</center></th>
+															<th class="col-md-1 alignright">VALOR</th>
 															<th class="col-md-1"><center></center></th>
 														</tr>
 													</thead>
 													<tbody id="conteudo-relatorio">
 													<?php foreach($hc->getListPagamentosBoletosPendentes() as $pagamento){?>
-													
-														
 														<tr class='linha_relatorio'>
-															<td class="col-md-1 valign">
-																<center>
-																<?php
-																	switch ($pagamento ["id_origem"]) {
-																		case "0" :
-																			echo "Avulso";
-																			break;
-																		case "1" :
-																			echo "Pedido";
-																			break;
-																		case "2" :
-																			echo "Faturamento";
-																			break;
-																		case "3" :
-																			echo "Tipo 3";
-																			break;
-																		case "4" :
-																			echo "Tipo 4";
-																			break;
-																		case "5" :
-																			echo "Tipo 5";
-																			break;
-																		case "6" :
-																			echo "Tipo 6";
-																			break;
-																		case "7" :
-																			echo "Tipo 7";
-																			break;
-																		case "8" :
-																			echo "Tipo 8";
-																			break;
-																		case "9" :
-																			echo "Tipo 9";
-																			break;
-																		default :
-																			echo "Não identificada";
-																			break;
-																	}
-																	?>
-																</center>
-															</td>
+															<td class="col-md-1 valign"><center><?= $pagamento ["descricao_origem"] ?></center></td>
 															<td class="col-md-1 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
+															<td class="col-md-1 valign"><center><?= $pagamento["codigo_origem"]?></center></td>
+															<td class="col-md-1 valign"><center><?= $pagamento["codigo_pagamento"]?></center></td>
 															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_criacao_origem"])) ?></center></td>
+															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_criacao"])) ?></center></td>
 															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_vencimento_boleto"]))?></center>
+															<td class="col-md-1 valign"><center><?= $pagamento["estado"] ?></center></td>
 															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_movimentacao"])) ?></center></td>
-															</td>
-															<td class="col-md-1 valign">
-																<center><?= $pagamento["estado"] ?></center>
-															</td>
-															<td class="col-md-1 valign">
-																<center>
-																<?= $pagamento["descricao_forma_pagamento"]?>
-																</center>
-															</td>
-															<td class="col-md-1 valign" align='right'>R$ <?php echo number_format($pagamento['valor_transacao'], 2, ',', '.'); ?></td>
+															<td class="col-md-1 valign"><center><?= $pagamento["descricao_forma_pagamento"]?></center></td>
 															<td class="col-md-1 valign" align='right'>R$ <?php echo number_format($pagamento['valor_transacao'], 2, ',', '.'); ?></td>
 															<td class="col-md-1 valign" align='right'>
-																<button type="button"
-																	class="btn btn-success dropdown-toggle"
-																	data-toggle="dropdown"
+																<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
 																	data-idt="<?= $pagamento['id_transacao'] ?>"
 																	onclick="imprimirBoleto(this)">Boleto</button>
 															</td>
-															<td class="col-md-1 valign alignright">
-																<center>
-																	<a data-toggle="collapse"
-																		href="#moreinfopagamentoboletospendentes-<?= $pagamento["id_transacao"]?>"
-																		aria-expanded="false" aria-controls="collapseExample"><span
-																		id="iconmorefinfoboletospendentes-<?= $pagamento["id_transacao"]?>"
-																		class="iconmorefinfoboletospendentes-<?= $pagamento["id_transacao"]?> glyphicon glyphicon-plus"
-																		aria-hidden="true"></span></a>
-																</center>
-															</td>
-														</tr>
-														<tr class="success">
-															<td class="moredetailpayment" colspan="11">
-																<div
-																	id="moreinfopagamentoboletospendentes-<?= $pagamento["id_transacao"]?>"
-																	data-idpagamento="<?= $pagamento["id_transacao"]?>"
-																	class="collapse moreinfopagamentoboletospendentes">
-																	<table id="table5" class="table table-hover sucess">
-																		<thead class="headhistorico">
-			<!-- 																<tr class="success"> -->
-			<!-- 																	<td class="col-md-4 "><center>NOSSO NÚMERO</center></td> -->
-			<!-- 																	<td class="col-md-4 "><center>CLIENTE</center></td> -->
-			<!-- 																	<td class="col-md-4 "><center>DATA CRIAÇÃO</center></td> -->
-			<!-- 																</tr> -->
-																		</thead>
-																		<tbody>
-																			<tr class="success">
-			<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
-			<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
-			<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
-																			</tr>
-																		</tbody>
-																	</table>
-																</div>
-															</td>
-														</tr>
-														
+														</tr>														
 													<?php }?>
 													<!-- <tr><td colspan='12' align='center'>Preencha os filtros!</td></tr> -->
 													</tbody>
@@ -349,122 +132,39 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 													<thead>
 														<tr>
 															<th class="col-md-1"><center>ORIGEM</center></th>
-															<th class="col-md-1"><center>NOSSO NÚMERO</center></th>
-															<th class="col-md-1"><center>ENTRADA</center></th>
+															<th class="col-md-1"><center>IDENTIFICADOR</center></th>
+															<th class="col-md-1"><center>CODIGO ORIGEM</center></th>
+															<th class="col-md-1"><center>CODIGO PAGAMENTO</center></th>
+															<th class="col-md-1"><center>DATA ORIGEM</center></th>
+															<th class="col-md-1"><center>DATA ENTRADA</center></th>
 															<th class="col-md-1"><center>VENCIMENTO</center></th>
-															<th class="col-md-1"><center>MOVIMENTAÇÃO</center></th>
 															<th class="col-md-1"><center>STATUS</center></th>
-															<th class="col-md-1"><center>FORMA PGTO.</center></th>
-															<th class="col-md-1 alignright">BRUTO</th>
-															<th class="col-md-1 alignright">LIQUIDO</th>
-															<th class="col-md-1"><center></center></th>
+															<th class="col-md-1"><center>DATA STATUS</center></th>
+															<th class="col-md-1"><center>FORMA PAGAMENTO</center></th>
+															<th class="col-md-1 alignright">VALOR</th>
 															<th class="col-md-1"><center></center></th>
 														</tr>
 													</thead>
 													<tbody id="conteudo-relatorio">
 													<?php foreach($hc->getListPagamentosBoletosRemessaPendentes() as $pagamento){?>
-													
 														<tr class='linha_relatorio'>
-															<td class="col-md-1 valign">
-																<center>
-																<?php
-																	switch ($pagamento ["id_origem"]) {
-																		case "0" :
-																			echo "Avulso";
-																			break;
-																		case "1" :
-																			echo "Pedido";
-																			break;
-																		case "2" :
-																			echo "Faturamento";
-																			break;
-																		case "3" :
-																			echo "Tipo 3";
-																			break;
-																		case "4" :
-																			echo "Tipo 4";
-																			break;
-																		case "5" :
-																			echo "Tipo 5";
-																			break;
-																		case "6" :
-																			echo "Tipo 6";
-																			break;
-																		case "7" :
-																			echo "Tipo 7";
-																			break;
-																		case "8" :
-																			echo "Tipo 8";
-																			break;
-																		case "9" :
-																			echo "Tipo 9";
-																			break;
-																		default :
-																			echo "Não identificada";
-																			break;
-																	}
-																	?>
-																</center>
-															</td>
+															<td class="col-md-1 valign"><center><?= $pagamento ["descricao_origem"] ?></center></td>
 															<td class="col-md-1 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
+															<td class="col-md-1 valign"><center><?= $pagamento["codigo_origem"]?></center></td>
+															<td class="col-md-1 valign"><center><?= $pagamento["codigo_pagamento"]?></center></td>
 															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_criacao_origem"])) ?></center></td>
+															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_criacao"])) ?></center></td>
 															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_vencimento_boleto"]))?></center>
+															<td class="col-md-1 valign"><center><?= $pagamento["estado"] ?></center></td>
 															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_movimentacao"])) ?></center></td>
-															</td>
-															<td class="col-md-1 valign">
-																<center><?= $pagamento["estado"] ?></center>
-															</td>
-															<td class="col-md-1 valign">
-																<center>
-																<?= $pagamento["descricao_forma_pagamento"]?>
-																</center>
-															</td>
-															<td class="col-md-1 valign" align='right'>R$ <?php echo number_format($pagamento['valor_transacao'], 2, ',', '.'); ?></td>
+															<td class="col-md-1 valign"><center><?= $pagamento["descricao_forma_pagamento"]?></center></td>
 															<td class="col-md-1 valign" align='right'>R$ <?php echo number_format($pagamento['valor_transacao'], 2, ',', '.'); ?></td>
 															<td class="col-md-1 valign" align='right'>
-																<button type="button"
-																	class="btn btn-success dropdown-toggle"
-																	data-toggle="dropdown"
+																<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
 																	data-idt="<?= $pagamento['id_transacao'] ?>"
 																	onclick="imprimirBoleto(this)">Boleto</button>
 															</td>
-															<td class="col-md-1 valign alignright">
-																<center>
-																	<a data-toggle="collapse"
-																		href="#moreinfopagamentoboletosremessapendentes-<?= $pagamento["id_transacao"]?>"
-																		aria-expanded="false" aria-controls="collapseExample"><span
-																		id="iconmorefinfoboletosremessapendentes-<?= $pagamento["id_transacao"]?>"
-																		class="iconmorefinfoboletosremessapendentes-<?= $pagamento["id_transacao"]?> glyphicon glyphicon-plus"
-																		aria-hidden="true"></span></a>
-																</center>
-															</td>
 														</tr>
-														<tr class="success">
-															<td class="moredetailpayment" colspan="11">
-																<div
-																	id="moreinfopagamentoboletosremessapendentes-<?= $pagamento["id_transacao"]?>"
-																	data-idpagamento="<?= $pagamento["id_transacao"]?>"
-																	class="collapse moreinfopagamentoboletosremessapendentes">
-																	<table id="table5" class="table table-hover sucess">
-																		<thead class="headhistorico">
-			<!-- 																<tr class="success"> -->
-			<!-- 																	<td class="col-md-4 "><center>NOSSO NÚMERO</center></td> -->
-			<!-- 																	<td class="col-md-4 "><center>CLIENTE</center></td> -->
-			<!-- 																	<td class="col-md-4 "><center>DATA CRIAÇÃO</center></td> -->
-			<!-- 																</tr> -->
-																		</thead>
-																		<tbody>
-																			<tr class="success">
-			<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
-			<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
-			<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
-																			</tr>
-																		</tbody>
-																	</table>
-																</div>
-															</td>
-														</tr>
-														
 													<?php }?>
 													<!-- <tr><td colspan='12' align='center'>Preencha os filtros!</td></tr> -->
 													</tbody>
@@ -479,132 +179,39 @@ date_default_timezone_set ( 'America/Sao_Paulo' );
 													<thead>
 														<tr>
 															<th class="col-md-1"><center>ORIGEM</center></th>
-															<th class="col-md-1"><center>NOSSO NÚMERO</center></th>
-															<th class="col-md-1"><center>ENTRADA</center></th>
+															<th class="col-md-1"><center>IDENTIFICADOR</center></th>
+															<th class="col-md-1"><center>CODIGO ORIGEM</center></th>
+															<th class="col-md-1"><center>CODIGO PAGAMENTO</center></th>
+															<th class="col-md-1"><center>DATA ORIGEM</center></th>
+															<th class="col-md-1"><center>DATA ENTRADA</center></th>
 															<th class="col-md-1"><center>VENCIMENTO</center></th>
-															<th class="col-md-1"><center>MOVIMENTAÇÃO</center></th>
 															<th class="col-md-1"><center>STATUS</center></th>
-															<th class="col-md-1"><center>FORMA PGTO.</center></th>
-															<th class="col-md-1 alignright">BRUTO</th>
-															<th class="col-md-1 alignright">LIQUIDO</th>
-															<th class="col-md-1"><center></center></th>
+															<th class="col-md-1"><center>DATA STATUS</center></th>
+															<th class="col-md-1"><center>FORMA PAGAMENTO</center></th>
+															<th class="col-md-1 alignright">VALOR</th>
 															<th class="col-md-1"><center></center></th>
 														</tr>
 													</thead>
 													<tbody id="conteudo-relatorio">
 													<?php foreach($hc->getListPagamentosBoletosRetornoPendentes() as $pagamento){?>
-													
 														<tr class='linha_relatorio'>
-															<td class="col-md-1 valign">
-																<center>
-																<?php
-																	switch ($pagamento ["id_origem"]) {
-																		case "0" :
-																			echo "Avulso";
-																			break;
-																		case "1" :
-																			echo "Pedido";
-																			break;
-																		case "2" :
-																			echo "Faturamento";
-																			break;
-																		case "3" :
-																			echo "Tipo 3";
-																			break;
-																		case "4" :
-																			echo "Tipo 4";
-																			break;
-																		case "5" :
-																			echo "Tipo 5";
-																			break;
-																		case "6" :
-																			echo "Tipo 6";
-																			break;
-																		case "7" :
-																			echo "Tipo 7";
-																			break;
-																		case "8" :
-																			echo "Tipo 8";
-																			break;
-																		case "9" :
-																			echo "Tipo 9";
-																			break;
-																		default :
-																			echo "Não identificada";
-																			break;
-																	}
-																	?>
-																</center>
-															</td>
+															<td class="col-md-1 valign"><center><?= $pagamento ["descricao_origem"] ?></center></td>
 															<td class="col-md-1 valign"><center><?= $pagamento["nosso_numero"]?></center></td>
+															<td class="col-md-1 valign"><center><?= $pagamento["codigo_origem"]?></center></td>
+															<td class="col-md-1 valign"><center><?= $pagamento["codigo_pagamento"]?></center></td>
 															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_criacao_origem"])) ?></center></td>
+															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_hora_criacao"])) ?></center></td>
 															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_vencimento_boleto"]))?></center>
+															<td class="col-md-1 valign"><center><?= $pagamento["estado"] ?></center></td>
 															<td class="col-md-1 valign"><center><?= date("d/m/Y", strtotime($pagamento["data_movimentacao"])) ?></center></td>
-															</td>
-															<td class="col-md-1 valign">
-																<center><?= $pagamento["estado"] ?></center>
-															</td>
-															<td class="col-md-1 valign">
-																<center>
-																<?= $pagamento["descricao_forma_pagamento"]?>
-																</center>
-															</td>
-															<td class="col-md-1 valign" align='right'>R$ <?php echo number_format($pagamento['valor_transacao'], 2, ',', '.'); ?></td>
+															<td class="col-md-1 valign"><center><?= $pagamento["descricao_forma_pagamento"]?></center></td>
 															<td class="col-md-1 valign" align='right'>R$ <?php echo number_format($pagamento['valor_transacao'], 2, ',', '.'); ?></td>
 															<td class="col-md-1 valign" align='right'>
-
-																<div class="btn-group">
-																	<button type="button"
-																		class="btn btn-success dropdown-toggle"
-																		data-toggle="dropdown" aria-haspopup="true"
-																		aria-expanded="false">
-																		Opções <span class="caret"></span>
-																	</button>
-																	<ul class="dropdown-menu">
-																		<li><a data-idt="<?= $pagamento['id_transacao'] ?>"
-																			onclick="prepararBaixa(this)" href="#">Dar baixa</a></li>
-																		<li><a href="#">Protestar</a></li>
-
-																	</ul>
-																</div>
-															</td>
-															<td class="col-md-1 valign alignright">
-																<center>
-																	<a data-toggle="collapse"
-																		href="#moreinfopagamentoboletosretornopendentes-<?= $pagamento["id_transacao"]?>"
-																		aria-expanded="false" aria-controls="collapseExample"><span
-																		id="iconmorefinfoboletosretornopendentes-<?= $pagamento["id_transacao"]?>"
-																		class="iconmorefinfoboletosretornopendentes-<?= $pagamento["id_transacao"]?> glyphicon glyphicon-plus"
-																		aria-hidden="true"></span></a>
-																</center>
+																<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
+																	data-idt="<?= $pagamento['id_transacao'] ?>"
+																	onclick="imprimirBoleto(this)">Boleto</button>
 															</td>
 														</tr>
-														<tr class="success">
-															<td class="moredetailpayment" colspan="11">
-																<div
-																	id="moreinfopagamentoboletosretornopendentes-<?= $pagamento["id_transacao"]?>"
-																	data-idpagamento="<?= $pagamento["id_transacao"]?>"
-																	class="collapse moreinfopagamentoboletosretornopendentes">
-																	<table id="table5" class="table table-hover sucess">
-																	<thead class="headhistorico">
-		<!-- 																<tr class="success"> -->
-		<!-- 																	<td class="col-md-4 "><center>NOSSO NÚMERO</center></td> -->
-		<!-- 																	<td class="col-md-4 "><center>CLIENTE</center></td> -->
-		<!-- 																	<td class="col-md-4 "><center>DATA CRIAÇÃO</center></td> -->
-		<!-- 																</tr> -->
-																	</thead>
-																	<tbody>
-																		<tr class="success">
-		<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
-		<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
-		<!-- 																	<td class="col-md-4 valign"><center></center></td> -->
-																		</tr>
-																	</tbody>
-																</table>
-																</div>
-															</td>
-														</tr>
-														
 													<?php }?>
 													<!-- <tr><td colspan='12' align='center'>Preencha os filtros!</td></tr> -->
 													</tbody>

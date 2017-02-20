@@ -84,9 +84,16 @@
 													data-selected-text-format="count" title="Selecione..."
 													data-width="100%" multiple>
 														<?php foreach ($_REQUEST["lstOperadoras"] as $operadora){?>
-															<option value="<?= $operadora["id_operadora"]?>"><?= $operadora["nome_operadora"]?></option>
+															<optgroup label="<?= $operadora["nomeOperadora"]?>">
+																<?php foreach ($operadora["contas"] as $contas){?>
+																	<option title="<?= $operadora["nomeOperadora"]?> - Ag: <?= $contas["agencia"]?> - CC:<?= $contas["conta"]?> - Cart: <?= $contas["carteira"]?>" value="<?= $contas["idOperadoraEmp"]?>">
+																		Carteira: <?= $contas["carteira"]?> - Ag.: <?= $contas["agencia"]?> - Conta: <?= $contas["conta"]?>
+																	</option>
+																<?php }?>
+																
+															</optgroup>
+															
 														<?php }?>
-														
 												</select> OPERADOR
 											</center></th>
 										
@@ -174,7 +181,7 @@
 		function solicitarAlteracaoStatus(elem){
 
 			$.ajax({
-		    	url : "../controllers/consultasController.php",
+		    	url : "<?= BaseProjeto ?>/controllers/consultasController.php",
 		        type: 'POST',
 		        data: {
 			        servico: "alterarStatus",
@@ -235,7 +242,7 @@
 	        	$.ajax({
 	        		async : true,
 	        		type : 'POST',
-	        		url : " <?= BaseProjeto ?>/controllers/consultasController.php",
+	        		url : "<?= BaseProjeto ?>/controllers/consultasController.php",
 	        		data : {
 	        			servico: "buscarBoletosFiltro",
 	        			identificador: identificador,
@@ -267,30 +274,14 @@
         }
 
         function contruirRelatorio(obj){
-//         	console.log(obj);
+        	console.log(obj);
         	var trs = "";
         	for (i in obj){
         		trs += 	"<tr class='linha_relatorio'>" +
-        					"<td class=\"col-md-1\"><center>" +  obj[i].identificador + "</center></td>" +
-        					"<td class=\"col-md-1\"><center>";
-        						switch(obj[i].id_origem){
-        							case "0":
-            							trs += "Avulso";
-            							break;
-        							case "1":
-            							trs += "Pedido";
-            							break;
-        							case "2":
-            							trs += "Faturamento";
-            							break;
-            						default:
-            							trs += "Não identificado";
-            							break;
-        						}
-        					
-        					trs += "</center></td>" +
-        					"<td class=\"col-md-1\"><center><a href=\"lista.php?pedido=" + obj[i].fk_pedido + "\">" + obj[i].fk_pedido + "</a></center></td>" +
-        					"<td class=\"col-md-2\"><center>" + obj[i].nome_operadora + "</center></td>" +
+        					"<td class=\"col-md-1\"><center>" + obj[i].identificador + "</center></td>" +
+        					"<td class=\"col-md-1\"><center>" + obj[i].descricao_origem + "</center></td>" +
+        					"<td class=\"col-md-1\"><center>" + obj[i].codigo_origem + "</a></center></td>" +
+        					"<td class=\"col-md-2\"><center>" + obj[i].nome_operadora + " - Ag: " + obj[i].numero_agencia + "- CC: " + obj[i].numero_conta + " - Cart: " + obj[i].codigo_carteira + "</center></td>" +
         					
         					"<td class=\"col-md-2\"><center>";
 	        					if (obj[i].data_criacao_origem){
@@ -328,13 +319,13 @@
 // 								console.log(obj[i].fk_status);
 								switch (obj[i].fk_status){
 									case "1": //Solicitação de registro
-										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" data-st=\"4\" data-rem=\"" + obj[i].fk_remessa + "\" onclick=\"solicitarAlteracaoStatus(this)\" href=\"#\">Cancelar</a></li>";
+										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" data-st=\"4\" data-rem=\"" + obj[i].fk_arquivo + "\" onclick=\"solicitarAlteracaoStatus(this)\" href=\"#\">Cancelar</a></li>";
 										trs += "<li role=\"separator\" class=\"divider\"></li>";
 										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" onclick=\"imprimirBoleto(this)\" href=\"#\">Boleto</a></li>";
 										break;
 									case "2": //Registrado
-										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" data-st=\"11\" data-rem=\"" + obj[i].fk_remessa + "\" onclick=\"solicitarAlteracaoStatus(this)\" href=\"#\">Cancelar</a></li>";
-										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" data-st=\"12\" data-rem=\"" + obj[i].fk_remessa + "\" onclick=\"solicitarAlteracaoStatus(this)\" href=\"#\">Protestar</a></li>"; 
+										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" data-st=\"11\" data-rem=\"" + obj[i].fk_arquivo + "\" onclick=\"solicitarAlteracaoStatus(this)\" href=\"#\">Cancelar</a></li>";
+										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" data-st=\"12\" data-rem=\"" + obj[i].fk_arquivo + "\" onclick=\"solicitarAlteracaoStatus(this)\" href=\"#\">Protestar</a></li>"; 
 										trs += "<li role=\"separator\" class=\"divider\"></li>";
 										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" onclick=\"imprimirBoleto(this)\" href=\"#\">Boleto</a></li>";
 										break;
@@ -342,7 +333,7 @@
 										trs += "<li class=\"dropdown-header\">Sem ações possíveis</li>";
 										break;
 									case "8": //Pendente
-										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" data-st=\"4\" data-rem=\"" + obj[i].fk_remessa + "\" onclick=\"solicitarAlteracaoStatus(this)\" href=\"#\">Cancelar</a></li>";
+										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" data-st=\"4\" data-rem=\"" + obj[i].fk_arquivo + "\" onclick=\"solicitarAlteracaoStatus(this)\" href=\"#\">Cancelar</a></li>";
 										trs += "<li role=\"separator\" class=\"divider\"></li>";
 										trs += "<li><a data-idt=\"" + obj[i].id_transacao + "\" onclick=\"imprimirBoleto(this)\" href=\"#\">Boleto</a></li>";
 										break;

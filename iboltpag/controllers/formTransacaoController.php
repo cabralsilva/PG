@@ -30,7 +30,7 @@
 		
 		$retornoAutenticacao = $ts->autenticarInsert($_POST["usr"], $_POST["pwd"]);
 		if ($retornoAutenticacao != null){
-			$retornoFP = $ts->getFormaPagamentoOperadoraEmpresa($retornoAutenticacao[0]["CODIGO"], $_POST["formaPagamento"], $_POST["operador"]);
+			$retornoFP = $ts->getFormaPagamentoOperadoraEmpresa($retornoAutenticacao[0]["CODIGO"], $_POST["formaPagamento"], $_POST["operadoraEmpresa"]);
 			if ($retornoFP["CodStatus"] == 1){
 				echo json_encode($ts->insertTransaction($_POST, $retornoFP["Model"]));
 			}else 

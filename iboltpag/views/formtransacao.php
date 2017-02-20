@@ -73,15 +73,13 @@
 								
 								<div class="col-xs-2">
 									<label for="origem">Origem</label>
-									<select class="form-control selectpicker" id="origem" data-width="100%" title="Selecione..." required>
-										<option value="0">Avulso</option>
-										<option value="1">Pedido</option>
-										<option value="2">Faturamento</option>
+									<select class="form-control selectpicker" id="origem" data-width="100%" title="Selecione..." disabled="true">
+										<option value="0" selected>Avulso</option>
 									</select>
 								</div>
 								<div class="col-xs-2">
 									<label for="id-pedido">Código da origem</label><a href="#" data-toggle="tooltip" data-placement="top" title="Código do Pedido, Faturamento ou etc a que este pagamento pertence">   <span class='glyphicon glyphicon-alert'></a>
-									<input id="id-pedido" type="number" class="form-control" required>
+									<input id="id-pedido" type="number" class="form-control" disabled="true">
 								</div>
 								<div class="col-xs-2">
 									<label for="id-pagamento">Código do pagamento</label><a href="#" data-toggle="tooltip" data-placement="top" title="Código que identifica o pagamento">   <span class='glyphicon glyphicon-alert'></a>
@@ -104,7 +102,7 @@
 										<?php }?>
 									</select>
 								</div>
-								<div class="col-xs-2">
+								<div class="col-xs-3">
 									<label for="operador">Operador(a)</label>
 									<select class="form-control selectpicker" id="operador" data-width="100%" title="Selecione..." required>
 										
@@ -299,11 +297,47 @@
         		success: function(e){
 					var objOP = JSON.stringify(eval("("+e+")"));
 					var objOP2 = JSON.parse(objOP);
+					var operadoras = [];
 					if (objOP2.CodStatus == 1){
 						var html = "";
 						for (var key in objOP2.Model) {
-							html += "<option value='" + objOP2.Model[key]["id_operadora"] + "'>" + objOP2.Model[key]["nome_operadora"] + "</option>";
+							var conta = {
+									idOperadoraEmp: objOP2.Model[key]["id_operadora_empresa"],
+									carteira: objOP2.Model[key]["codigo_carteira"],
+									agencia: objOP2.Model[key]["numero_agencia"],
+									conta: objOP2.Model[key]["numero_conta"]
+							};
+							var obj = {
+									idOperadora: objOP2.Model[key]["id_operadora"],
+									nomeOperadora: objOP2.Model[key]["nome_operadora"],
+									contas: [conta]
+							};
+
+							var existe = operadoras.some(function(el, i){
+							    return el.idOperadora === obj.idOperadora;
+							});
+							
+							
+							if (!existe){
+								operadoras.push(obj);	
+							}else{
+								operadoras.forEach(function(el, i){
+								    if(el.idOperadora === obj.idOperadora) {
+								        el.contas.push(conta);
+								    }
+								});
+							}
 						}
+
+						for (var ind in operadoras) {
+							html += "<optgroup label='" + operadoras[ind].nomeOperadora + "'>";
+							operadoras[ind].contas.forEach(function(valor, chave){
+							    html += "<option title='" + operadoras[ind].nomeOperadora + " Ag: " + valor.agencia + "- CC: " + valor.conta + "- Cart: " + valor.carteira + "' value='" + valor.idOperadoraEmp + "'>Carteira: " + valor.carteira + " - Ag.: " + valor.agencia + " - Conta: " + valor.conta + "</option>";
+							});
+							html += "</optgroup>";
+						}
+						
+						
 						$("#operador").html(html);
 						$("#operador").selectpicker('refresh');
 					}
@@ -391,12 +425,12 @@
 	        		data : {
 	        			servico: "createTransacao",
 	        			origem: $("#origem").find("option:selected")[0].value,
-	        			codigoOrigem: (!isAvulso) ? $("#id-pedido").val() : $("#id-pagamento").val(),
+	        			codigoOrigem: $("#id-pagamento").val(),
 	        			codigoPagamento: $("#id-pagamento").val(),
 // 	        			dataDocumento: $("#dataDocumento").val(),
 						dataDocumento: moment().format('D/M/Y'),
 	        			formaPagamento: $("#forma-pagamento").find("option:selected")[0].value,
-	        			operador: $("#operador").find("option:selected")[0].value,
+	        			operadoraEmpresa: $("#operador").find("option:selected")[0].value,
 	        			valorDocumento: valor,
 	        			dataVencimento: $("#dataVencimentoDocumento").val(),
 // 	        			numParcelas: $("#num-parcelas").val(),

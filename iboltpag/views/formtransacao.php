@@ -5,7 +5,7 @@
 	$fc = new FormController ();
 	if (!isset($_SESSION["usuario_logado"])){
 		$_SESSION["falha_login"] = "Autenticação necessária";
-		header("location: " . BaseProjeto . "/../");
+		header("location: " . BaseProjeto . "/");
 	}
 	date_default_timezone_set ( 'America/Sao_Paulo' );
 	getOperadorasBoleto($_SESSION["dados_acesso"][0]["CODIGO"]);

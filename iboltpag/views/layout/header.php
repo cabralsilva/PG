@@ -7,7 +7,7 @@
 				aria-expanded="false">
 				Opções <span class="caret"></span>
 			</button>
-			<ul class="dropdown-menu">
+			<ul class="dropdown-menu drop-down-canto">
 				<li><a href="pagamentos-pendentes">Pagamentos pendentes</a></li>
 				<li><a href="buscas-pagamentos">Buscas e totalizadores</a></li>
 				
@@ -16,8 +16,8 @@
 				<li><a href="#modalRemessa" data-toggle="modal" data-target="#modalRemessa">Gerar remessa</a></li>
 				<li><a href="#modalRetorno" data-toggle="modal" data-target="#modalRetorno">Processar retorno</a></li>
 				<li role="separator" class="divider"></li>
-				<li><a href="../sistemas/">Sistemas</a></li>
-				<li><a href="../logout/">Logout</a></li>
+<!-- 				<li><a href="../sistemas/">Sistemas</a></li> -->
+				<li><a href="<?= BaseProjeto ?>/logout/">Logout</a></li>
 			</ul>
 		</div>
 	</div>

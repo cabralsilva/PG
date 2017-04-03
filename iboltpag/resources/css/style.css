@@ -4,58 +4,6 @@
 	margin-top:150px;
 }
 
-.box-azul{
-    /*definimos a largura do box*/
-    width:100%;
-    /* definimos a altura do box */
-    height:200px;
-    /* definimos a cor de fundo do box */
-    background-color:#06F;
-    /* definimos o quão arredondado irá ficar nosso box */
-    border-radius: 10px;
-	filter: alpha(opacity=65);
-	margin-bottom: 50px;
-	position: relative;
-}
-.box-verde{
-    /*definimos a largura do box*/
-    width:100%;
-    /* definimos a altura do box */
-    height:200px;
-    /* definimos a cor de fundo do box */
-    background-color:#0F0;
-    /* definimos o quão arredondado irá ficar nosso box */
-    border-radius: 10px;
-	filter: alpha(opacity=65);
-	margin-bottom: 50px;
-	position: relative;
-}
-.box-amarelo{
-    /*definimos a largura do box*/
-    width:100%;
-    /* definimos a altura do box */
-    height:200px;
-    /* definimos a cor de fundo do box */
-    background-color:#FF0;
-    /* definimos o quão arredondado irá ficar nosso box */
-    border-radius: 10px;
-	filter: alpha(opacity=65);
-	margin-bottom: 50px;
-	position: relative;
-}
-.box-vermelho{
-    /*definimos a largura do box*/
-    width:100%;
-    /* definimos a altura do box */
-    height:200px;
-    /* definimos a cor de fundo do box */
-    background-color:#F00;
-    /* definimos o quão arredondado irá ficar nosso box */
-    border-radius: 10px;
-	filter: alpha(opacity=65);
-	margin-bottom: 50px;
-	position: relative;
-}
 
 .headtabela{
 	font-weight:bold;
@@ -128,12 +76,12 @@ form{
 
 @media (min-width: 1400px){
     .containerrelatorio{
-        width: 1370px !important;
+        width: 100% !important;
     }
 }
 @media (min-width: 1600px){
     .containerrelatorio{
-        width: 1450px !important;
+        width: 100% !important;
     }
 }
 
@@ -238,4 +186,24 @@ form{
 
 .modal-dialog{
 	width: 70% !important;
+}
+
+.drop-down-canto{
+	left: -100% !important;
+}
+
+.frmFiltros{
+	font-size: 10px !important;
+}
+
+.labelrangedate{
+	width: 10% !important;
+}
+
+#btnFiltrar{
+	width: 100% !important;
+}
+
+.alert-pesquisa{
+	display: inline-block !important;
 }

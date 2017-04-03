@@ -17,7 +17,7 @@
 			$this->listPagamentosPendentes = $ts->getPagamentosPendentes($_SESSION["dados_acesso"][0]["CODIGO"]);
 			foreach($this->listPagamentosPendentes as $pagamentoPendente){
 				
-				if($pagamentoPendente["descricao_forma_pagamento"] == "Boleto à vista")
+				if($pagamentoPendente["id_forma_pagamento"] == 22)
 					array_push($this->listPagamentosBoletosPendentes, $pagamentoPendente);
 				else 
 					array_push($this->listPagamentosCartoesPendentes, $pagamentoPendente);

@@ -1,6 +1,7 @@
 <?php
 require_once '../services/TransacaoService.php';
 require_once '../services/StatusService.php';
+require_once '../services/OrigensService.php';
 class ConsultasController {
 	function __construct() {
 		session_start ();
@@ -59,17 +60,16 @@ class ConsultasController {
 		$retorno = $ss->getStatusTodos ();
 		$_REQUEST ["lstStatusTodos"] = $retorno;
 	}
+	
+	public function buscarOrigens(){
+		$os = new OrigensService();
+		$_REQUEST ["lstOrigens"] = $os->getOrigens();
+	}
 }
 
 if (isset ( $_POST ["servico"] )) {
-	if ($_POST ["servico"] == "buscarBoletos")
-		buscarBoletos ();
-	elseif ($_POST ["servico"] == "buscarBoletosFiltro")
+	if ($_POST ["servico"] == "buscarBoletosFiltro")
 		buscarBoletosFiltro ();
-	elseif ($_POST ["servico"] == "gerarRemessa")
-		gerarRemessa ();
-	elseif ($_POST ["servico"] == "gerarRemessaDia")
-		gerarRemessaDia ();
 	elseif ($_POST ["servico"] == "alterarStatus")
 		alterarStatus ();
 } else {
@@ -104,21 +104,55 @@ function alterarStatus() {
 function buscarBoletosFiltro() {
 	$ts = new TransacaoService ();
 	session_start ();
-	$identificador = $_POST ["identificador"];
-	$listOrigem = split ( ",", $_POST ["origem"] );
-	$codOrigem = $_POST ["codOrigem"];
-	$listaOperadoras = split ( ",", $_POST ["operadoras"] );
-	$_POST ["dataPeriodoI"] = str_replace ( '/', '-', $_POST ["dataPeriodoI"] );
-	$_POST ["dataPeriodoF"] = str_replace ( '/', '-', $_POST ["dataPeriodoF"] );
-	$_POST ["dataPeriodoI"] = date ( "Y-m-d H:i:s", strtotime ( $_POST ["dataPeriodoI"] . " 00:00:00" ) );
-	$_POST ["dataPeriodoF"] = date ( "Y-m-d H:i:s", strtotime ( $_POST ["dataPeriodoF"] . " 23:59:59" ) );
-	$dateI = $_POST ["dataPeriodoI"];
-	$dateF = $_POST ["dataPeriodoF"];
-	$listaStatus = split ( ",", $_POST ["status"] );
-	$listaFormaPgto = split ( ",", $_POST ["formaPgto"] );
-	$valorTransacao = str_replace ( ",", ".", $_POST ["valorTransacao"] );
 	
-	$listaPagamentos = $ts->buscarPersonalizadaPagamentos ( $identificador, $listOrigem, $codOrigem, $listaOperadoras, $dateI, $dateF, $listaStatus, $listaFormaPgto, $valorTransacao );
+// 	$identificador = $_POST ["identificador"];
+	$_POST ["lstOrigem"] = split ( ",", $_POST ["lstOrigem"] );
+// 	$codOrigem = $_POST ["codOrigem"];
+// 	$codPagamento = $_POST ["codPagamento"];
+	$_POST ["lstOperadoras"] = split ( ",", $_POST ["lstOperadoras"] );
+	
+	if($_POST["dataOrigemI"] != "" && $_POST ["dataOrigemF"] != ""){
+		$_POST ["dataOrigemI"] = str_replace ( '/', '-', $_POST ["dataOrigemI"] );
+		$_POST ["dataOrigemF"] = str_replace ( '/', '-', $_POST ["dataOrigemF"] );
+		$_POST ["dataOrigemI"] = date ( "Y-m-d H:i:s", strtotime ( $_POST ["dataOrigemI"] . " 00:00:00" ) );
+		$_POST ["dataOrigemF"] = date ( "Y-m-d H:i:s", strtotime ( $_POST ["dataOrigemF"] . " 23:59:59" ) );
+	}else{
+		$_POST ["dataOrigemI"] = null;
+		$_POST ["dataOrigemF"] = null;
+	}
+// 	$dateI = $_POST ["dataOrigemI"];
+// 	$dateF = $_POST ["dataOrigemF"];
+	
+	if($_POST["dataEntradaI"] != "" && $_POST ["dataEntradaF"] != ""){
+		$_POST ["dataEntradaI"] = str_replace ( '/', '-', $_POST ["dataEntradaI"] );
+		$_POST ["dataEntradaF"] = str_replace ( '/', '-', $_POST ["dataEntradaF"] );
+		$_POST ["dataEntradaI"] = date ( "Y-m-d H:i:s", strtotime ( $_POST ["dataEntradaI"] . " 00:00:00" ) );
+		$_POST ["dataEntradaF"] = date ( "Y-m-d H:i:s", strtotime ( $_POST ["dataEntradaF"] . " 23:59:59" ) );
+	}else{
+		$_POST ["dataEntradaI"] = null;
+		$_POST ["dataEntradaF"] = null;
+	}
+// 	$dateI = $_POST ["dataEntradaI"];
+// 	$dateF = $_POST ["dataEntradaF"];
+	
+	if($_POST["dataPagamentoI"] != "" && $_POST ["dataPagamentoF"] != ""){
+		$_POST ["dataPagamentoI"] = str_replace ( '/', '-', $_POST ["dataPagamentoI"] );
+		$_POST ["dataPagamentoF"] = str_replace ( '/', '-', $_POST ["dataPagamentoF"] );
+		$_POST ["dataPagamentoI"] = date ( "Y-m-d H:i:s", strtotime ( $_POST ["dataPagamentoI"] . " 00:00:00" ) );
+		$_POST ["dataPagamentoF"] = date ( "Y-m-d H:i:s", strtotime ( $_POST ["dataPagamentoF"] . " 23:59:59" ) );
+	}else{
+		$_POST ["dataPagamentoI"] = null;
+		$_POST ["dataPagamentoF"] = null;
+	}
+// 	$dateI = $_POST ["dataPagamentoI"];
+// 	$dateF = $_POST ["dataPagamentoF"];
+	
+	$_POST ["lstStatus"] = split ( ",", $_POST ["lstStatus"] );
+	$_POST ["lstFormaPgto"] = split ( ",", $_POST ["lstFormaPgto"] );
+	$_POST ["valorTransacao"] = str_replace ( ",", ".", $_POST ["valorTransacao"] );
+	$_POST ["valorPago"] = str_replace ( ",", ".", $_POST ["valorPago"] );
+	
+	$listaPagamentos = $ts->buscarPersonalizadaPagamentos ( $_POST );
 	// $_SESSION["listaTransacoesBoletos"] = array();
 	// foreach ($listaPagamentos as $value){
 	// array_push($_SESSION["listaTransacoesBoletos"], $value);

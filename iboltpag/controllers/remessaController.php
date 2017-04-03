@@ -62,10 +62,8 @@
 		$dataI = date("Y-m-d H:i:s", strtotime($_POST["dataRemessa"] . " 00:00:00"));
 		$dataF = date("Y-m-d H:i:s", strtotime($_POST["dataRemessa"] . " 23:59:59"));
 		
-		if($_POST["banco"] == 3) $retorno = $ts->gerarRemessaBradescos400Dia($dataI, $dataF, $_POST["banco"], $_SESSION["dados_acesso"][0]["CODIGO"]);
-		elseif($_POST["banco"] == 4) $retorno = $ts->gerarRemessaBancodoBrasil400Dia($dataI, $dataF, $_POST["banco"], $_SESSION["dados_acesso"][0]["CODIGO"]);
-		else {
-			$retorno = $ts->gerarRemessa($dataI, $dataF, $_POST["banco"], $_SESSION["dados_acesso"][0]["CODIGO"]);
-		}
+		
+		$retorno = $ts->gerarRemessa($dataI, $dataF, $_POST["banco"], $_SESSION["dados_acesso"][0]["CODIGO"]);
+		
 		echo json_encode($retorno);
 	}

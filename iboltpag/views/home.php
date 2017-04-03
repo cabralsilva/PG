@@ -7,7 +7,7 @@ $hc = new HomeController ();
 
 if (!isset($_SESSION["usuario_logado"])){
 	$_SESSION["falha_login"] = "Autenticação necessária";
-	header("location: " . BaseProjeto . "/../");
+	header("location: " . BaseProjeto . "/");
 }
 
 $hc->buscarPagamentosPendentes ();
